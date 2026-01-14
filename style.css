@@ -125,10 +125,10 @@ body{
 .price-box span{
   display:block;
   margin-top:6px;
-  font-weight:700;
+  font-weight:650;
   color:var(--text);
   opacity:.8;
-  font-size:13px;
+  font-size:9px;
 }
 
 .price-box:hover{
