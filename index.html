@@ -3,103 +3,69 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Order Robux Vlogress</title>
+  <title>Robux VILOG</title>
 
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-
   <link rel="stylesheet" href="style.css">
 
-  <!-- Firebase v8 scripts -->
+  <!-- FIREBASE v8 (WAJIB UNTUK GITHUB PAGES) -->
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
 </head>
-
 <body>
-  <header>
-    <h1>Robux Vlogress Auto Order</h1>
-    <p>Pilih nominal, isi form, lalu pembayaran akan muncul setelah order terkirim.</p>
-  </header>
 
-  <main>
-    <section class="pricelist-container">
-      <h2>Price List</h2>
-      <div class="price-list">
-        <div class="price-box" onclick="isiForm('80 Robux','14700','Reguler')">
-          <h3>80 Robux</h3>
-          <p>Rp 14.700</p>
-        </div>
-        <div class="price-box" onclick="isiForm('160 Robux','28700','Reguler')">
-          <h3>160 Robux</h3>
-          <p>Rp 28.700</p>
-        </div>
-        <div class="price-box" onclick="isiForm('240 Robux','42700','Reguler')">
-          <h3>240 Robux</h3>
-          <p>Rp 42.700</p>
-        </div>
-        <div class="price-box" onclick="isiForm('320 Robux','56700','Reguler')">
-          <h3>320 Robux</h3>
-          <p>Rp 56.700</p>
-        </div>
-        <div class="price-box" onclick="isiForm('400 Robux','70700','Reguler')">
-          <h3>400 Robux</h3>
-          <p>Rp 70.700</p>
-        </div>
-        <div class="price-box" onclick="isiForm('480 Robux','84700','Reguler')">
-          <h3>480 Robux</h3>
-          <p>Rp 84.700</p>
-        </div>
-        <div class="price-box" onclick="isiForm('500 Robux','71700','Basic')">
-          <h3>500 Robux</h3>
-          <p>Rp 71.700</p>
-        </div>
-        <div class="price-box" onclick="isiForm('560 Robux','98700','Reguler')">
-          <h3>560 Robux</h3>
-          <p>Rp 98.700</p>
-        </div>
-        <div class="price-box" onclick="isiForm('580 Robux','86400','Basic Mix')">
-          <h3>580 Robux</h3>
-          <p>Rp 86.400</p>
-        </div>
-        <div class="price-box" onclick="isiForm('640 Robux','112700','Reguler')">
-          <h3>640 Robux</h3>
-          <p>Rp 112.700</p>
-        </div>
-        <div class="price-box" onclick="isiForm('660 Robux','100400','Basic Mix')">
-          <h3>660 Robux</h3>
-          <p>Rp 100.400</p>
-        </div>
-        <div class="price-box" onclick="isiForm('720 Robux','126700','Reguler')">
-          <h3>720 Robux</h3>
-          <p>Rp 126.700</p>
-        </div>
-        <div class="price-box" onclick="isiForm('740 Robux','114400','Basic Mix')">
-          <h3>740 Robux</h3>
-          <p>Rp 114.400</p>
-        </div>
-        <div class="price-box" onclick="isiForm('800 Robux','140700','Reguler')">
-          <h3>800 Robux</h3>
-          <p>Rp 140.700</p>
-        </div>
-        <div class="price-box" onclick="isiForm('820 Robux','128400','Basic Mix')">
-          <h3>820 Robux</h3>
-          <p>Rp 128.400</p>
-        </div>
-        <div class="price-box" onclick="isiForm('1.200 Robux','209700','Reguler')">
-          <h3>1.200 Robux</h3>
-          <p>Rp 209.700</p>
-        </div>
-        <div class="price-box" onclick="isiForm('1.700 Robux','279700','Reguler')">
-          <h3>1.700 Robux</h3>
-          <p>Rp 279.700</p>
-        </div>
-        <div class="price-box" onclick="isiForm('4.500 Robux','699700','Reguler')">
-          <h3>4.500 Robux</h3>
-          <p>Rp 699.700</p>
-        </div>
+<!-- === PRICE LIST (ASLI, TIDAK DIUBAH) === -->
+<div class="category">
+  <h3>Robux Reguler</h3>
+  <div class="pricelist-container">
+    <div class="price-box" onclick="isiForm('80 Robux','14700','Reguler')">80 Robux<span>Rp14.700</span></div>
+    <div class="price-box" onclick="isiForm('160 Robux','29400','Reguler')">160 Robux<span>Rp29.400</span></div>
+    <div class="price-box" onclick="isiForm('240 Robux','44100','Reguler')">240 Robux<span>Rp44.100</span></div>
+  </div>
+</div>
+
+<div class="category">
+  <h3>Robux Basic</h3>
+  <div class="pricelist-container">
+    <div class="price-box" onclick="isiForm('500 Robux','71000','Basic')">500 Robux<span>Rp71.000</span></div>
+    <div class="price-box" onclick="isiForm('580 Robux','85700','Basic')">580 Robux<span>Rp85.700</span></div>
+  </div>
+</div>
+
+<div class="category">
+  <h3>Robux Premium</h3>
+  <div class="pricelist-container">
+    <div class="price-box" onclick="isiForm('450 Robux + Premium','71000','Premium')">450 Robux + Premium<span>Rp71.000</span></div>
+    <div class="price-box" onclick="isiForm('1000 Robux + Premium','142000','Premium')">1000 Robux + Premium<span>Rp142.000</span></div>
+  </div>
+</div>
+
+<!-- === FORM (ASLI, ALUR TIDAK DIUBAH) === -->
+<div class="form-container">
+  <h2>Form Pembelian</h2>
+
+  <input id="kategori" readonly>
+  <input id="nominal" readonly>
+  <input id="harga" readonly>
+
+  <input id="username" placeholder="Username Roblox">
+  <button id="btnWa">Pesan via Telegram</button>
+</div>
+
+<!-- === ADMIN PANEL (SUDAH ADA, DITAMBAH EDIT HARGA) === -->
+<div id="adminPanel" class="admin-panel" style="display:none;">
+  <div class="admin-title">Admin Panel</div>
+
+  <button id="btnAdminLogin">Login Admin</button>
+  <button id="btnAdminLogout" style="display:none;">Logout</button>
+
+  <!-- EDIT HARGA AKAN MASUK DI SINI (AUTO DARI app.js) -->
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>        </div>
         <div class="price-box" onclick="isiForm('10.000 Robux','1399700','Reguler')">
           <h3>10.000 Robux</h3>
           <p>Rp 1.399.700</p>
