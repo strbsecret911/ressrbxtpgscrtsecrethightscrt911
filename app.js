@@ -9,13 +9,13 @@ import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signO
 
 // >>> CONFIG PUNYAMU (sama seperti sebelumnya)
 const firebaseConfig = {
-  apiKey: "AIzaSyDpNvuwxq9bgAV700hRxAkcs7BgrzHd72A",
-  authDomain: "autoorderobux.firebaseapp.com",
-  projectId: "autoorderobux",
-  storageBucket: "autoorderobux.firebasestorage.app",
-  messagingSenderId: "505258620852",
-  appId: "1:505258620852:web:9daf566902c7efe73324e1",
-  measurementId: "G-QMZ8R007VB"
+  apiKey: "AIzaSyDDQeZpHp5bFay6gRigg0pddEUqOL3cytQ",
+  authDomain: "rbxvilogress.firebaseapp.com",
+  projectId: "rbxvilogress",
+  storageBucket: "rbxvilogress.firebasestorage.app",
+  messagingSenderId: "907657980689",
+  appId: "1:907657980689:web:3282ce42765c3643e47ab0",
+  measurementId: "G-ZQ6EP4D1DD"
 };
 
 const ADMIN_EMAIL = "dinijanuari23@gmail.com";
