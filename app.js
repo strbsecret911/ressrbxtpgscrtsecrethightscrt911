@@ -13,7 +13,6 @@ import {
   serverTimestamp,
   writeBatch,
   deleteDoc,
-  getDocs
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 import {
   getAuth,
@@ -36,6 +35,14 @@ const firebaseConfig = {
 const ADMIN_EMAIL = "dinijanuari23@gmail.com";
 const STORE_DOC_PATH = ["settings", "store"]; // settings/store -> { open: true/false }
 const PRICE_COL = "pricelist_items";          // collection pricelist_items
+
+// ✅ Kategori dropdown fixed
+const CATEGORY_OPTIONS = [
+  "Robux Reguler",
+  "Robux Basic",
+  "Robux + Premium (1 Month)",
+  "Best offers 💯"
+];
 
 // panel admin hanya tampil kalau URL ada ?admin=1
 const wantAdminPanel = new URLSearchParams(window.location.search).get("admin") === "1";
@@ -126,17 +133,15 @@ function groupByCategory(items){
 }
 
 function normalizeAndSort(items){
-  // pastikan field ada biar tidak bikin error
   const cleaned = items.map(it => ({
     ...it,
     category: String(it.category || 'Lainnya'),
     type: String(it.type || ''),
     label: String(it.label || ''),
     price: Number(it.price || 0),
-    sort: Number(it.sort || 0)
+    sort: Number(it.sort || 0),
   }));
 
-  // sort lokal: category A-Z, sort asc
   cleaned.sort((a,b)=>{
     const c = a.category.localeCompare(b.category);
     if(c !== 0) return c;
@@ -210,26 +215,34 @@ async function setStoreOpen(flag){
 }
 
 // =======================
-// PRICELIST: REALTIME LISTENER (FIX UTAMA)
+// PRICELIST: REALTIME LISTENER
 // =======================
 let unsubPricelist = null;
 
 function startPricelistListener(){
-  const root = document.getElementById('pricelistRoot');
+  // ambil root kalau ada
+  let root = document.getElementById('pricelistRoot');
+
+  // ✅ kalau root belum ada, BUAT otomatis dan taruh sebelum form
   if(!root){
-    // ini penyebab paling sering
-    showPopup('Notification', 'Pricelist tidak tampil', 'Pastikan ada <div id="pricelistRoot"></div> di HTML.');
-    return;
+    const form = document.querySelector('.form-container');
+    root = document.createElement('div');
+    root.id = 'pricelistRoot';
+
+    if(form && form.parentNode){
+      form.parentNode.insertBefore(root, form);
+    } else {
+      document.body.insertBefore(root, document.body.firstChild);
+    }
   }
 
   const colRef = collection(db, PRICE_COL);
 
-  // realtime
   unsubPricelist = onSnapshot(colRef, (snap) => {
     const items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     pricelistCache = normalizeAndSort(items);
 
-    // sinkron admin draft
+    // sync admin draft dari firestore
     adminDraft = pricelistCache.map(x => ({ ...x }));
 
     renderPricelistToPage();
@@ -239,7 +252,9 @@ function startPricelistListener(){
     showPopup(
       'Notification',
       'Pricelist gagal dimuat',
-      err?.message?.includes('permission') ? 'Kemungkinan Firestore Rules belum allow read.' : (err?.message || 'Error')
+      err?.message?.includes('permission')
+        ? 'Firestore Rules kemungkinan belum allow read.'
+        : (err?.message || 'Error')
     );
   });
 }
@@ -286,7 +301,6 @@ function renderPricelistToPage(){
       const id = box.getAttribute('data-id');
       const it = pricelistCache.find(x => x.id === id);
       if(!it) return;
-      // isiForm butuh (nominal,label), harga, kategori(type)
       window.isiForm(String(it.label || ''), String(it.price || 0), String(it.type || ''));
     });
   });
@@ -325,7 +339,13 @@ function renderAdminList(){
         <div class="admin-grid">
           <div>
             <label>Kategori (judul section)</label>
-            <input type="text" data-k="category" value="${escapeHtml(it.category || '')}">
+            <select data-k="category">
+              ${CATEGORY_OPTIONS.map(opt => `
+                <option value="${escapeHtml(opt)}" ${String(it.category||'') === opt ? 'selected' : ''}>
+                  ${escapeHtml(opt)}
+                </option>
+              `).join('')}
+            </select>
           </div>
 
           <div>
@@ -352,14 +372,15 @@ function renderAdminList(){
     `;
   }).join('');
 
-  // bind inputs & delete
+  // bind inputs & selects & delete
   wrap.querySelectorAll('.admin-row').forEach(row => {
     const idx = Number(row.getAttribute('data-idx'));
 
-    row.querySelectorAll('input').forEach(inp => {
-      inp.addEventListener('input', () => {
-        const k = inp.getAttribute('data-k');
-        let v = inp.value;
+    row.querySelectorAll('input, select').forEach(el => {
+      const evt = (el.tagName === 'SELECT') ? 'change' : 'input';
+      el.addEventListener(evt, () => {
+        const k = el.getAttribute('data-k');
+        let v = el.value;
         if(k === 'price' || k === 'sort') v = Number(v || 0);
         adminDraft[idx][k] = v;
       });
@@ -374,7 +395,7 @@ function renderAdminList(){
       if(item.id){
         await deleteDoc(doc(db, PRICE_COL, item.id));
       }
-      // listener realtime akan refresh otomatis
+      // listener realtime auto refresh
     });
   });
 }
@@ -386,7 +407,7 @@ function adminAddItem(){
   }
   adminDraft.unshift({
     id: '',
-    category: 'Robux Reguler',
+    category: CATEGORY_OPTIONS[0], // ✅ default dari dropdown
     type: 'Reguler',
     label: 'Item Baru',
     price: 0,
@@ -408,7 +429,7 @@ async function adminSaveAll(){
   for(const it of adminDraft){
     if(!String(it.category||'').trim() || !String(it.type||'').trim() || !String(it.label||'').trim()){
       if(msg) msg.textContent = 'Gagal: kategori, tipe, label wajib diisi.';
-      showPopup('Notification', 'Oops', 'Kategori, tipe, label wajib diisi.');
+      showPopup('Notification', 'Oops', 'Kategori, tipe, dan label wajib diisi.');
       return;
     }
     if(Number(it.price) < 0){
@@ -442,7 +463,7 @@ async function adminSaveAll(){
 
   await batch.commit();
   if(msg) msg.textContent = '✅ Tersimpan';
-  // listener realtime akan update tampilan otomatis
+  // listener realtime update otomatis
 }
 
 // =======================
