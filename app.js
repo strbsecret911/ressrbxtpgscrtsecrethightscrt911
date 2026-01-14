@@ -8,16 +8,13 @@ import {
   getFirestore,
   doc,
   collection,
-  query,
-  orderBy,
-  getDocs,
   onSnapshot,
   setDoc,
   serverTimestamp,
   writeBatch,
-  deleteDoc
+  deleteDoc,
+  getDocs
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
-
 import {
   getAuth,
   GoogleAuthProvider,
@@ -128,8 +125,29 @@ function groupByCategory(items){
   return map;
 }
 
+function normalizeAndSort(items){
+  // pastikan field ada biar tidak bikin error
+  const cleaned = items.map(it => ({
+    ...it,
+    category: String(it.category || 'Lainnya'),
+    type: String(it.type || ''),
+    label: String(it.label || ''),
+    price: Number(it.price || 0),
+    sort: Number(it.sort || 0)
+  }));
+
+  // sort lokal: category A-Z, sort asc
+  cleaned.sort((a,b)=>{
+    const c = a.category.localeCompare(b.category);
+    if(c !== 0) return c;
+    return (a.sort - b.sort);
+  });
+
+  return cleaned;
+}
+
 // =======================
-// ADMIN UI (OPEN/CLOSE + AUTH)
+// STORE STATUS UI (OPEN/CLOSE)
 // =======================
 function applyStoreStatusUI(){
   const badge = document.getElementById('adminBadge');
@@ -145,6 +163,9 @@ function applyStoreStatusUI(){
   if(btn) btn.disabled = false;
 }
 
+// =======================
+// ADMIN UI
+// =======================
 function applyAdminUI(user){
   const panel = document.getElementById('adminPanel');
   const btnLogin = document.getElementById('btnAdminLogin');
@@ -154,7 +175,6 @@ function applyAdminUI(user){
   const btnSetClose = document.getElementById('btnSetClose');
 
   if(!panel) return;
-
   panel.style.display = wantAdminPanel ? 'block' : 'none';
 
   if(!btnLogin || !btnLogout || !emailEl || !btnSetOpen || !btnSetClose) return;
@@ -172,10 +192,8 @@ function applyAdminUI(user){
   btnSetOpen.disabled = !isAdmin;
   btnSetClose.disabled = !isAdmin;
 
-  // editor area (kalau ada)
   const btnAdd = document.getElementById('btnAddItem');
   const btnSave = document.getElementById('btnSaveAll');
-
   if(btnAdd) btnAdd.disabled = !isAdmin;
   if(btnSave) btnSave.disabled = !isAdmin;
 
@@ -192,20 +210,55 @@ async function setStoreOpen(flag){
 }
 
 // =======================
-// PRICELIST: LOAD + RENDER
+// PRICELIST: REALTIME LISTENER (FIX UTAMA)
 // =======================
-async function loadPricelistOnce(){
+let unsubPricelist = null;
+
+function startPricelistListener(){
+  const root = document.getElementById('pricelistRoot');
+  if(!root){
+    // ini penyebab paling sering
+    showPopup('Notification', 'Pricelist tidak tampil', 'Pastikan ada <div id="pricelistRoot"></div> di HTML.');
+    return;
+  }
+
   const colRef = collection(db, PRICE_COL);
-  const q = query(colRef, orderBy('category'), orderBy('sort'));
-  const snap = await getDocs(q);
-  pricelistCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-  // copy for admin
-  adminDraft = pricelistCache.map(x => ({ ...x }));
+
+  // realtime
+  unsubPricelist = onSnapshot(colRef, (snap) => {
+    const items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    pricelistCache = normalizeAndSort(items);
+
+    // sinkron admin draft
+    adminDraft = pricelistCache.map(x => ({ ...x }));
+
+    renderPricelistToPage();
+    renderAdminList();
+  }, (err) => {
+    console.error(err);
+    showPopup(
+      'Notification',
+      'Pricelist gagal dimuat',
+      err?.message?.includes('permission') ? 'Kemungkinan Firestore Rules belum allow read.' : (err?.message || 'Error')
+    );
+  });
 }
 
 function renderPricelistToPage(){
   const root = document.getElementById('pricelistRoot');
   if(!root) return;
+
+  if(!pricelistCache.length){
+    root.innerHTML = `
+      <div class="category">
+        <h3>Pricelist</h3>
+        <div style="color:#9ca3af;font-size:13px;padding:10px;">
+          Belum ada item pricelist. Admin bisa tambah dari panel.
+        </div>
+      </div>
+    `;
+    return;
+  }
 
   const grouped = groupByCategory(pricelistCache);
 
@@ -228,12 +281,12 @@ function renderPricelistToPage(){
 
   root.innerHTML = html;
 
-  // click -> isiForm
   root.querySelectorAll('.price-box').forEach(box => {
     box.addEventListener('click', () => {
       const id = box.getAttribute('data-id');
       const it = pricelistCache.find(x => x.id === id);
       if(!it) return;
+      // isiForm butuh (nominal,label), harga, kategori(type)
       window.isiForm(String(it.label || ''), String(it.price || 0), String(it.type || ''));
     });
   });
@@ -241,7 +294,6 @@ function renderPricelistToPage(){
 
 // =======================
 // ADMIN CRUD PRICELIST
-// (butuh elemen adminList, btnAddItem, btnSaveAll, adminSaveMsg di HTML)
 // =======================
 function renderAdminList(){
   const wrap = document.getElementById('adminList');
@@ -253,12 +305,12 @@ function renderAdminList(){
   }
 
   if(!isAdmin){
-    wrap.innerHTML = `<div style="font-size:12px;color:#6b7280;">Login admin dulu untuk edit pricelist.</div>`;
+    wrap.innerHTML = `<div class="admin-savemsg">Login admin dulu untuk edit pricelist.</div>`;
     return;
   }
 
   if(!adminDraft.length){
-    wrap.innerHTML = `<div style="font-size:12px;color:#6b7280;">Belum ada item.</div>`;
+    wrap.innerHTML = `<div class="admin-savemsg">Belum ada item.</div>`;
     return;
   }
 
@@ -300,7 +352,7 @@ function renderAdminList(){
     `;
   }).join('');
 
-  // bind inputs
+  // bind inputs & delete
   wrap.querySelectorAll('.admin-row').forEach(row => {
     const idx = Number(row.getAttribute('data-idx'));
 
@@ -319,15 +371,10 @@ function renderAdminList(){
       const item = adminDraft[idx];
       if(!confirm('Hapus item ini?')) return;
 
-      // delete di firestore kalau sudah ada id
       if(item.id){
         await deleteDoc(doc(db, PRICE_COL, item.id));
       }
-
-      adminDraft.splice(idx, 1);
-      // refresh public
-      await refreshPricelist();
-      renderAdminList();
+      // listener realtime akan refresh otomatis
     });
   });
 }
@@ -361,7 +408,7 @@ async function adminSaveAll(){
   for(const it of adminDraft){
     if(!String(it.category||'').trim() || !String(it.type||'').trim() || !String(it.label||'').trim()){
       if(msg) msg.textContent = 'Gagal: kategori, tipe, label wajib diisi.';
-      showPopup('Notification', 'Oops', 'Kategori, tipe, dan label wajib diisi.');
+      showPopup('Notification', 'Oops', 'Kategori, tipe, label wajib diisi.');
       return;
     }
     if(Number(it.price) < 0){
@@ -374,58 +421,42 @@ async function adminSaveAll(){
   const batch = writeBatch(db);
   const colRef = collection(db, PRICE_COL);
 
-  // upsert semua dari draft
   for(const it of adminDraft){
+    const data = {
+      category: String(it.category).trim(),
+      type: String(it.type).trim(),
+      label: String(it.label).trim(),
+      price: Number(it.price || 0),
+      sort: Number(it.sort || 0),
+      updatedAt: serverTimestamp()
+    };
+
     if(it.id){
-      const ref = doc(db, PRICE_COL, it.id);
-      batch.set(ref, {
-        category: String(it.category).trim(),
-        type: String(it.type).trim(),
-        label: String(it.label).trim(),
-        price: Number(it.price || 0),
-        sort: Number(it.sort || 0),
-        updatedAt: serverTimestamp()
-      }, { merge: true });
-    } else {
-      const ref = doc(colRef); // auto id
-      it.id = ref.id;
-      batch.set(ref, {
-        category: String(it.category).trim(),
-        type: String(it.type).trim(),
-        label: String(it.label).trim(),
-        price: Number(it.price || 0),
-        sort: Number(it.sort || 0),
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp()
-      });
+      batch.set(doc(db, PRICE_COL, it.id), data, { merge: true });
+    }else{
+      const newRef = doc(colRef);
+      it.id = newRef.id;
+      batch.set(newRef, { ...data, createdAt: serverTimestamp() });
     }
   }
 
   await batch.commit();
-
   if(msg) msg.textContent = '✅ Tersimpan';
-  await refreshPricelist();
-  renderAdminList();
-}
-
-async function refreshPricelist(){
-  await loadPricelistOnce();
-  renderPricelistToPage();
+  // listener realtime akan update tampilan otomatis
 }
 
 // =======================
-// FORM LOGIC (sesuai kode kamu)
+// FORM LOGIC (punyamu)
 // =======================
 function formatHarga(harga){
   const hargaNumber = typeof harga === 'number' ? harga : Number(String(harga).replace(/[^\d]/g,''));
   return { hargaNumber, hargaText: "Rp" + new Intl.NumberFormat('id-ID').format(hargaNumber) };
 }
 
-// isiForm dipakai dari onclick HTML -> taruh di window
 window.isiForm = function isiForm(nominal, harga, kategori) {
   document.getElementById("nominal").value = nominal;
 
-  const { hargaNumber, hargaText } = formatHarga(harga);
+  const { hargaText } = formatHarga(harga);
   document.getElementById("harga").value = hargaText;
 
   document.getElementById("kategori").value = kategori;
@@ -443,7 +474,6 @@ function updateV2LOptions() {
   const backupDiv = document.getElementById("backupCode_div");
   const emailDiv = document.getElementById("emailNote_div");
 
-  // V2L OFF
   if (v2lVal !== "ON") {
     metodeDiv.classList.add("hidden");
     backupDiv.classList.add("hidden");
@@ -452,10 +482,8 @@ function updateV2LOptions() {
     return;
   }
 
-  // V2L ON
   metodeDiv.classList.remove("hidden");
 
-  // Basic & Premium = wajib Backup Code (sesuai tulisan di halaman)
   const mustBackup = (kategori === "Basic" || kategori === "Premium");
 
   if (mustBackup) {
@@ -467,7 +495,6 @@ function updateV2LOptions() {
     backupDiv.classList.remove("hidden");
     emailDiv.classList.add("hidden");
   } else {
-    // Reguler -> boleh Backup Code / Kode Email
     metodeSelect.innerHTML =
       '<option value="">-- Pilih Metode --</option>' +
       '<option value="Backup Code">Backup Code</option>' +
@@ -488,7 +515,7 @@ function updateV2LOptions() {
 }
 
 // =======================
-// PAYMENT MODAL (sama seperti kode kamu)
+// PAYMENT MODAL (punyamu)
 // =======================
 function showPaymentPopup(qrUrl, hargaFormatted) {
   const backdrop = document.getElementById('paymentModalBackdrop');
@@ -525,7 +552,7 @@ function showPaymentPopup(qrUrl, hargaFormatted) {
       number: '',
       calcTotal: (base) => {
         if (base <= 499000) return base;
-        const fee = Math.round(base * 0.003); // 0.3%
+        const fee = Math.round(base * 0.003);
         return base + fee;
       },
       note: 'QRIS hingga Rp499.000 tidak ada biaya tambahan. Di atas itu akan dikenakan biaya 0,3% dari nominal.',
@@ -586,7 +613,6 @@ function showPaymentPopup(qrUrl, hargaFormatted) {
     methodButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.method === methodKey));
 
     const cfg = METHOD_CONFIG[methodKey];
-
     walletLabel.textContent = cfg.label;
     walletNote.textContent = cfg.note;
 
@@ -673,7 +699,7 @@ function showPaymentPopup(qrUrl, hargaFormatted) {
 // =======================
 // DOM READY
 // =======================
-document.addEventListener('DOMContentLoaded', async function(){
+document.addEventListener('DOMContentLoaded', function(){
 
   // V2L listeners
   document.getElementById("v2l")?.addEventListener("change", function() {
@@ -693,16 +719,8 @@ document.addEventListener('DOMContentLoaded', async function(){
     }
   });
 
-  // =======================
-  // LOAD PRICELIST ONCE (render)
-  // =======================
-  try{
-    await loadPricelistOnce();
-    renderPricelistToPage();
-  }catch(e){
-    console.error(e);
-    // kalau gagal load, biarin (page tetap jalan)
-  }
+  // ✅ START REALTIME PRICELIST
+  startPricelistListener();
 
   // =======================
   // FIRESTORE: LISTEN STORE STATUS (GLOBAL)
@@ -749,7 +767,7 @@ document.addEventListener('DOMContentLoaded', async function(){
   document.getElementById('btnSetOpen')?.addEventListener('click', ()=> setStoreOpen(true));
   document.getElementById('btnSetClose')?.addEventListener('click', ()=> setStoreOpen(false));
 
-  // Admin editor buttons (kalau element ada di HTML)
+  // admin editor actions
   document.getElementById('btnAddItem')?.addEventListener('click', adminAddItem);
   document.getElementById('btnSaveAll')?.addEventListener('click', adminSaveAll);
 
@@ -758,19 +776,13 @@ document.addEventListener('DOMContentLoaded', async function(){
   // =======================
   document.getElementById("btnWa")?.addEventListener("click", function() {
 
-    // ✅ STOP kalau CLOSE
     if (!storeOpen) {
-      showPopup(
-        'Notification',
-        'CLOSE',
-        'Mohon maaf, saat ini kamu belum bisa melakukan pemesanan. Silahkan kembali lagi nanti.'
-      );
+      showPopup('Notification','CLOSE','Mohon maaf, saat ini kamu belum bisa melakukan pemesanan. Silahkan kembali lagi nanti.');
       return;
     }
 
     const form = document.getElementById("orderForm");
 
-    // cek required fields
     const inputs = form.querySelectorAll("input[required], select[required]");
     for (const input of inputs) {
       if (!String(input.value || '').trim()) {
