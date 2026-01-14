@@ -4,8 +4,27 @@
 // FIREBASE (CDN)
 // =======================
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-import { getFirestore, doc, onSnapshot, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+import {
+  getFirestore,
+  doc,
+  collection,
+  query,
+  orderBy,
+  getDocs,
+  onSnapshot,
+  setDoc,
+  serverTimestamp,
+  writeBatch,
+  deleteDoc
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+import {
+  getAuth,
+  GoogleAuthProvider,
+  signInWithPopup,
+  onAuthStateChanged,
+  signOut
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDDQeZpHp5bFay6gRigg0pddEUqOL3cytQ",
@@ -19,6 +38,7 @@ const firebaseConfig = {
 
 const ADMIN_EMAIL = "dinijanuari23@gmail.com";
 const STORE_DOC_PATH = ["settings", "store"]; // settings/store -> { open: true/false }
+const PRICE_COL = "pricelist_items";          // collection pricelist_items
 
 // panel admin hanya tampil kalau URL ada ?admin=1
 const wantAdminPanel = new URLSearchParams(window.location.search).get("admin") === "1";
@@ -30,6 +50,10 @@ const provider = new GoogleAuthProvider();
 
 let storeOpen = true;
 let isAdmin = false;
+
+// cache items
+let pricelistCache = []; // [{id, category, type, label, price, sort}]
+let adminDraft = [];     // editable copy for admin
 
 // =======================
 // POPUP iOS (OK only)
@@ -78,7 +102,34 @@ function showPopup(title, message, submessage){
 }
 
 // =======================
-// ADMIN UI
+// UTILS
+// =======================
+function escapeHtml(str){
+  return String(str ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
+}
+
+function rupiah(num){
+  const n = Number(num || 0);
+  return "Rp" + new Intl.NumberFormat('id-ID').format(n);
+}
+
+function groupByCategory(items){
+  const map = new Map();
+  for(const it of items){
+    const cat = it.category || 'Lainnya';
+    if(!map.has(cat)) map.set(cat, []);
+    map.get(cat).push(it);
+  }
+  return map;
+}
+
+// =======================
+// ADMIN UI (OPEN/CLOSE + AUTH)
 // =======================
 function applyStoreStatusUI(){
   const badge = document.getElementById('adminBadge');
@@ -120,6 +171,15 @@ function applyAdminUI(user){
 
   btnSetOpen.disabled = !isAdmin;
   btnSetClose.disabled = !isAdmin;
+
+  // editor area (kalau ada)
+  const btnAdd = document.getElementById('btnAddItem');
+  const btnSave = document.getElementById('btnSaveAll');
+
+  if(btnAdd) btnAdd.disabled = !isAdmin;
+  if(btnSave) btnSave.disabled = !isAdmin;
+
+  renderAdminList();
 }
 
 async function setStoreOpen(flag){
@@ -129,6 +189,228 @@ async function setStoreOpen(flag){
   }
   const ref = doc(db, STORE_DOC_PATH[0], STORE_DOC_PATH[1]);
   await setDoc(ref, { open: !!flag, updatedAt: serverTimestamp() }, { merge: true });
+}
+
+// =======================
+// PRICELIST: LOAD + RENDER
+// =======================
+async function loadPricelistOnce(){
+  const colRef = collection(db, PRICE_COL);
+  const q = query(colRef, orderBy('category'), orderBy('sort'));
+  const snap = await getDocs(q);
+  pricelistCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  // copy for admin
+  adminDraft = pricelistCache.map(x => ({ ...x }));
+}
+
+function renderPricelistToPage(){
+  const root = document.getElementById('pricelistRoot');
+  if(!root) return;
+
+  const grouped = groupByCategory(pricelistCache);
+
+  let html = '';
+  for(const [cat, arr] of grouped.entries()){
+    html += `
+      <div class="category">
+        <h3>${escapeHtml(cat)}</h3>
+        <div class="pricelist-container">
+          ${arr.map(it => `
+            <div class="price-box" data-id="${escapeHtml(it.id)}">
+              ${escapeHtml(it.label || '')}
+              <span>${escapeHtml(rupiah(it.price))}</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  root.innerHTML = html;
+
+  // click -> isiForm
+  root.querySelectorAll('.price-box').forEach(box => {
+    box.addEventListener('click', () => {
+      const id = box.getAttribute('data-id');
+      const it = pricelistCache.find(x => x.id === id);
+      if(!it) return;
+      window.isiForm(String(it.label || ''), String(it.price || 0), String(it.type || ''));
+    });
+  });
+}
+
+// =======================
+// ADMIN CRUD PRICELIST
+// (butuh elemen adminList, btnAddItem, btnSaveAll, adminSaveMsg di HTML)
+// =======================
+function renderAdminList(){
+  const wrap = document.getElementById('adminList');
+  if(!wrap) return;
+
+  if(!wantAdminPanel){
+    wrap.innerHTML = '';
+    return;
+  }
+
+  if(!isAdmin){
+    wrap.innerHTML = `<div style="font-size:12px;color:#6b7280;">Login admin dulu untuk edit pricelist.</div>`;
+    return;
+  }
+
+  if(!adminDraft.length){
+    wrap.innerHTML = `<div style="font-size:12px;color:#6b7280;">Belum ada item.</div>`;
+    return;
+  }
+
+  wrap.innerHTML = adminDraft.map((it, idx) => {
+    return `
+      <div class="admin-row" data-idx="${idx}">
+        <div class="admin-row-top">
+          <div class="admin-row-id">ID: ${escapeHtml(it.id || '(baru)')}</div>
+          <button type="button" class="admin-del" data-act="del">Hapus</button>
+        </div>
+
+        <div class="admin-grid">
+          <div>
+            <label>Kategori (judul section)</label>
+            <input type="text" data-k="category" value="${escapeHtml(it.category || '')}">
+          </div>
+
+          <div>
+            <label>Tipe (untuk form: Reguler/Basic/Premium)</label>
+            <input type="text" data-k="type" value="${escapeHtml(it.type || '')}">
+          </div>
+
+          <div class="full">
+            <label>Label (contoh: 500 Robux)</label>
+            <input type="text" data-k="label" value="${escapeHtml(it.label || '')}">
+          </div>
+
+          <div>
+            <label>Harga (angka)</label>
+            <input type="number" min="0" step="1" data-k="price" value="${Number(it.price || 0)}">
+          </div>
+
+          <div>
+            <label>Sort (angka kecil tampil dulu)</label>
+            <input type="number" step="1" data-k="sort" value="${Number(it.sort || 0)}">
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  // bind inputs
+  wrap.querySelectorAll('.admin-row').forEach(row => {
+    const idx = Number(row.getAttribute('data-idx'));
+
+    row.querySelectorAll('input').forEach(inp => {
+      inp.addEventListener('input', () => {
+        const k = inp.getAttribute('data-k');
+        let v = inp.value;
+        if(k === 'price' || k === 'sort') v = Number(v || 0);
+        adminDraft[idx][k] = v;
+      });
+    });
+
+    row.querySelector('[data-act="del"]').addEventListener('click', async () => {
+      if(!isAdmin) return;
+
+      const item = adminDraft[idx];
+      if(!confirm('Hapus item ini?')) return;
+
+      // delete di firestore kalau sudah ada id
+      if(item.id){
+        await deleteDoc(doc(db, PRICE_COL, item.id));
+      }
+
+      adminDraft.splice(idx, 1);
+      // refresh public
+      await refreshPricelist();
+      renderAdminList();
+    });
+  });
+}
+
+function adminAddItem(){
+  if(!isAdmin){
+    showPopup('Notification', 'Akses ditolak', 'Login admin dulu ya.');
+    return;
+  }
+  adminDraft.unshift({
+    id: '',
+    category: 'Robux Reguler',
+    type: 'Reguler',
+    label: 'Item Baru',
+    price: 0,
+    sort: 0
+  });
+  renderAdminList();
+}
+
+async function adminSaveAll(){
+  if(!isAdmin){
+    showPopup('Notification', 'Akses ditolak', 'Login admin dulu ya.');
+    return;
+  }
+
+  const msg = document.getElementById('adminSaveMsg');
+  if(msg) msg.textContent = 'Menyimpan...';
+
+  // validasi
+  for(const it of adminDraft){
+    if(!String(it.category||'').trim() || !String(it.type||'').trim() || !String(it.label||'').trim()){
+      if(msg) msg.textContent = 'Gagal: kategori, tipe, label wajib diisi.';
+      showPopup('Notification', 'Oops', 'Kategori, tipe, dan label wajib diisi.');
+      return;
+    }
+    if(Number(it.price) < 0){
+      if(msg) msg.textContent = 'Gagal: harga tidak boleh minus.';
+      showPopup('Notification', 'Oops', 'Harga tidak boleh minus.');
+      return;
+    }
+  }
+
+  const batch = writeBatch(db);
+  const colRef = collection(db, PRICE_COL);
+
+  // upsert semua dari draft
+  for(const it of adminDraft){
+    if(it.id){
+      const ref = doc(db, PRICE_COL, it.id);
+      batch.set(ref, {
+        category: String(it.category).trim(),
+        type: String(it.type).trim(),
+        label: String(it.label).trim(),
+        price: Number(it.price || 0),
+        sort: Number(it.sort || 0),
+        updatedAt: serverTimestamp()
+      }, { merge: true });
+    } else {
+      const ref = doc(colRef); // auto id
+      it.id = ref.id;
+      batch.set(ref, {
+        category: String(it.category).trim(),
+        type: String(it.type).trim(),
+        label: String(it.label).trim(),
+        price: Number(it.price || 0),
+        sort: Number(it.sort || 0),
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      });
+    }
+  }
+
+  await batch.commit();
+
+  if(msg) msg.textContent = '✅ Tersimpan';
+  await refreshPricelist();
+  renderAdminList();
+}
+
+async function refreshPricelist(){
+  await loadPricelistOnce();
+  renderPricelistToPage();
 }
 
 // =======================
@@ -149,7 +431,7 @@ window.isiForm = function isiForm(nominal, harga, kategori) {
   document.getElementById("kategori").value = kategori;
 
   updateV2LOptions();
-  document.querySelector('.form-container').scrollIntoView({ behavior: 'smooth' });
+  document.querySelector('.form-container')?.scrollIntoView({ behavior: 'smooth' });
 };
 
 function updateV2LOptions() {
@@ -391,14 +673,14 @@ function showPaymentPopup(qrUrl, hargaFormatted) {
 // =======================
 // DOM READY
 // =======================
-document.addEventListener('DOMContentLoaded', function(){
+document.addEventListener('DOMContentLoaded', async function(){
 
   // V2L listeners
-  document.getElementById("v2l").addEventListener("change", function() {
+  document.getElementById("v2l")?.addEventListener("change", function() {
     updateV2LOptions();
   });
 
-  document.getElementById("metodeV2L").addEventListener("change", function() {
+  document.getElementById("metodeV2L")?.addEventListener("change", function() {
     if (this.value === "Backup Code") {
       document.getElementById("backupCode_div").classList.remove("hidden");
       document.getElementById("emailNote_div").classList.add("hidden");
@@ -410,6 +692,17 @@ document.addEventListener('DOMContentLoaded', function(){
       document.getElementById("emailNote_div").classList.add("hidden");
     }
   });
+
+  // =======================
+  // LOAD PRICELIST ONCE (render)
+  // =======================
+  try{
+    await loadPricelistOnce();
+    renderPricelistToPage();
+  }catch(e){
+    console.error(e);
+    // kalau gagal load, biarin (page tetap jalan)
+  }
 
   // =======================
   // FIRESTORE: LISTEN STORE STATUS (GLOBAL)
@@ -456,10 +749,14 @@ document.addEventListener('DOMContentLoaded', function(){
   document.getElementById('btnSetOpen')?.addEventListener('click', ()=> setStoreOpen(true));
   document.getElementById('btnSetClose')?.addEventListener('click', ()=> setStoreOpen(false));
 
+  // Admin editor buttons (kalau element ada di HTML)
+  document.getElementById('btnAddItem')?.addEventListener('click', adminAddItem);
+  document.getElementById('btnSaveAll')?.addEventListener('click', adminSaveAll);
+
   // =======================
   // KIRIM TELEGRAM + PAYMENT
   // =======================
-  document.getElementById("btnWa").addEventListener("click", function() {
+  document.getElementById("btnWa")?.addEventListener("click", function() {
 
     // ✅ STOP kalau CLOSE
     if (!storeOpen) {
