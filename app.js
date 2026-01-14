@@ -7,7 +7,6 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/fireba
 import { getFirestore, doc, onSnapshot, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
-// >>> CONFIG PUNYAMU (sama seperti sebelumnya)
 const firebaseConfig = {
   apiKey: "AIzaSyDDQeZpHp5bFay6gRigg0pddEUqOL3cytQ",
   authDomain: "rbxvilogress.firebaseapp.com",
