@@ -1,11 +1,7 @@
-// ===============================
-// FIREBASE INIT (v9 - MODULAR)
-// ===============================
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import { getFirestore, doc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-
-const firebaseConfig = {
+// =======================
+// FIREBASE INIT (v8)
+// =======================
+var firebaseConfig = {
   apiKey: "AIzaSyDDQeZpHp5bFay6gRigg0pddEUqOL3cytQ",
   authDomain: "rbxvilogress.firebaseapp.com",
   projectId: "rbxvilogress",
@@ -15,92 +11,132 @@ const firebaseConfig = {
   measurementId: "G-ZQ6EP4D1DD"
 };
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
+firebase.initializeApp(firebaseConfig);
 
-// ===============================
-// GLOBAL STATE
-// ===============================
-let STORE_OPEN = true;
-let RATE_REGULER = 0;
-let RATE_USD = 0;
+var db = firebase.firestore();
+var auth = firebase.auth();
+var ADMIN_EMAIL = "dinijanuari23@gmail.com";
 
-// ===============================
-// LOAD OPEN / CLOSE
-// ===============================
-async function loadStoreStatus() {
-  const snap = await getDoc(doc(db, "settings", "store"));
-  if (snap.exists()) {
-    STORE_OPEN = snap.data().open === true;
-  }
+// =======================
+// OPEN / CLOSE BOT
+// =======================
+firebase.firestore()
+  .doc("settings/store")
+  .onSnapshot(function (snap) {
+    if (snap.exists && snap.data().open === false) {
+      document.body.innerHTML =
+        "<h3 style='text-align:center;margin-top:40px'>STORE CLOSED</h3>";
+    }
+  });
+
+// =======================
+// PRICE OVERRIDE (MANUAL)
+// =======================
+function parseOnclick(el) {
+  var m = el.getAttribute("onclick")
+    ?.match(/isiForm\('([^']+)','([^']+)','([^']+)'\)/);
+  if (!m) return null;
+  return {
+    label: m[1],
+    price: Number(m[2]),
+    category: m[3],
+    nominal: Number(m[1].replace(/[^\d]/g, ""))
+  };
 }
 
-// ===============================
-// LOAD RATE
-// ===============================
-async function loadRates() {
-  const snap = await getDoc(doc(db, "settings", "rates"));
-  if (snap.exists()) {
-    RATE_REGULER = snap.data().rate_reguler;
-    RATE_USD = snap.data().rate_usd;
-  }
+function applyPrice(el, price) {
+  var info = parseOnclick(el);
+  if (!info) return;
+  el.setAttribute(
+    "onclick",
+    "isiForm('" + info.label + "','" + price + "','" + info.category + "')"
+  );
+  var span = el.querySelector("span");
+  if (span) span.innerText = "Rp" + price.toLocaleString("id-ID");
 }
 
-// ===============================
-// HITUNG HARGA (IDR)
-// ===============================
-function hitungHarga(item) {
-  if (item.category === "reguler") {
-    return item.usd * RATE_REGULER;
-  }
+function loadPrices() {
+  db.collection("prices").get().then(function (snap) {
+    snap.forEach(function (docu) {
+      var key = docu.id;
+      var price = docu.data().price;
 
-  if (item.category === "basic" || item.category === "premium") {
-    return item.usd * RATE_USD;
-  }
-
-  if (item.category === "mix") {
-    let total = 0;
-    item.parts.forEach(p => {
-      if (p.category === "reguler") {
-        total += p.usd * RATE_REGULER;
-      } else {
-        total += p.usd * RATE_USD;
-      }
+      document.querySelectorAll(".price-box").forEach(function (box) {
+        var info = parseOnclick(box);
+        if (!info) return;
+        var k = info.category + "__" + info.nominal;
+        if (k === key) applyPrice(box, price);
+      });
     });
-    return total;
-  }
-
-  return 0;
-}
-
-// ===============================
-// LOAD PRICE LIST (TOMBOL)
-// ===============================
-async function loadPriceList() {
-  const snap = await getDocs(collection(db, "pricelist"));
-  snap.forEach(docu => {
-    const item = docu.data();
-    if (!item.active) return;
-
-    const harga = hitungHarga(item);
-
-    // ⬇️ PENTING
-    // Di SINI kamu panggil fungsi lama kamu
-    // untuk bikin tombol + onclick isiForm(...)
-    //
-    // contoh (sesuaikan dengan HTML lama):
-    // renderButton(item.robux, harga, item.category);
   });
 }
 
-// ===============================
-// INIT
-// ===============================
-(async () => {
-  await loadStoreStatus();
-  if (!STORE_OPEN) return;
+// =======================
+// ADMIN PANEL (EDIT HARGA)
+// =======================
+function enableAdminEditor() {
+  var panel = document.getElementById("adminPanel");
+  if (!panel) return;
 
-  await loadRates();
-  await loadPriceList();
-})();
+  var wrap = document.createElement("div");
+  wrap.innerHTML = `
+    <div style="margin-top:8px;font-weight:800">Edit Harga</div>
+    <div id="priceEditor"></div>
+    <button id="savePrices">Simpan Harga</button>
+  `;
+  panel.appendChild(wrap);
+
+  var list = wrap.querySelector("#priceEditor");
+
+  document.querySelectorAll(".price-box").forEach(function (box) {
+    var info = parseOnclick(box);
+    if (!info) return;
+    var key = info.category + "__" + info.nominal;
+
+    var row = document.createElement("div");
+    row.innerHTML = `
+      <div style="font-size:11px">${info.label}</div>
+      <input data-key="${key}" type="number" value="${info.price}">
+    `;
+    list.appendChild(row);
+  });
+
+  document.getElementById("savePrices").onclick = function () {
+    var batch = db.batch();
+    list.querySelectorAll("input[data-key]").forEach(function (inp) {
+      batch.set(
+        db.collection("prices").doc(inp.dataset.key),
+        { price: Number(inp.value) }
+      );
+    });
+    batch.commit().then(function () {
+      alert("Harga tersimpan");
+      loadPrices();
+    });
+  };
+}
+
+// =======================
+// ADMIN AUTH
+// =======================
+if (location.search.includes("admin=1")) {
+  document.getElementById("btnAdminLogin").onclick = function () {
+    auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+  };
+
+  document.getElementById("btnAdminLogout").onclick = function () {
+    auth.signOut();
+  };
+
+  auth.onAuthStateChanged(function (user) {
+    if (user && user.email === ADMIN_EMAIL) {
+      document.getElementById("adminPanel").style.display = "block";
+      enableAdminEditor();
+    }
+  });
+}
+
+// =======================
+// INIT
+// =======================
+document.addEventListener("DOMContentLoaded", loadPrices);
