@@ -500,3 +500,65 @@ input:focus, select:focus{
 }
 
 .admin-savemsg{font-size:12px; color:var(--text); opacity:.75}
+
+.validation-center{
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+
+  width: min(360px, 90vw);
+  background: #ffffff;
+  color: #213652;
+  border-radius: 14px;
+  box-shadow: 0 20px 40px rgba(0,0,0,.2);
+
+  padding: 16px;
+  text-align: center;
+  animation: popupIn .18s ease-out;
+}
+
+@keyframes popupIn{
+  from{
+    opacity: 0;
+    transform: translate(-50%, -55%) scale(.96);
+  }
+  to{
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.validation-center .hdr{
+  font-weight: 800;
+  font-size: 16px;
+  margin-bottom: 6px;
+}
+
+.validation-center .txt{
+  font-size: 14px;
+  line-height: 1.4;
+  margin-top: 6px;
+}
+
+.validation-center .subtxt{
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 6px;
+}
+
+.validation-center .btnRow{
+  margin-top: 14px;
+}
+
+.validation-center .okbtn{
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: none;
+  background: #153760;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
