@@ -36,14 +36,10 @@ function showPopup(title, message, submessage) {
   popup.focus({ preventScroll: true });
 
   const t = setTimeout(removePopup, 7000);
-  window.addEventListener(
-    "pagehide",
-    () => {
-      clearTimeout(t);
-      if (popup) popup.remove();
-    },
-    { once: true }
-  );
+  window.addEventListener("pagehide", () => {
+    clearTimeout(t);
+    if (popup) popup.remove();
+  }, { once: true });
 }
 
 function formatHarga(harga) {
@@ -60,24 +56,20 @@ function formatHarga(harga) {
 
 window.isiForm = function isiForm(nominal, harga, kategori) {
   document.getElementById("nominal").value = nominal;
-
-  const { hargaText } = formatHarga(harga);
-  document.getElementById("harga").value = hargaText;
-
+  document.getElementById("harga").value = formatHarga(harga).hargaText;
   document.getElementById("kategori").value = kategori;
-
   updateV2LOptions();
   document.querySelector(".form-section")?.scrollIntoView({ behavior: "smooth" });
 };
 
 function updateV2LOptions() {
   const v2lEl = document.getElementById("v2l");
-  const metodeSelect = document.getElementById("metodeV2L");
   const metodeDiv = document.getElementById("metodeV2L_div");
+  const metodeSelect = document.getElementById("metodeV2L");
   const backupDiv = document.getElementById("backupCode_div");
   const emailDiv = document.getElementById("emailNote_div");
 
-  if (!v2lEl || !metodeSelect || !metodeDiv || !backupDiv || !emailDiv) return;
+  if (!v2lEl || !metodeDiv || !metodeSelect || !backupDiv || !emailDiv) return;
 
   const v2lVal = String(v2lEl.value || "").trim().toUpperCase();
 
@@ -92,7 +84,7 @@ function updateV2LOptions() {
 
   metodeDiv.classList.remove("hidden");
 
-  const previousValue = metodeSelect.value;
+  const oldValue = metodeSelect.value;
 
   metodeSelect.innerHTML = `
     <option value="">-- Pilih Metode --</option>
@@ -100,11 +92,8 @@ function updateV2LOptions() {
     <option value="Kode Email">Kode Email</option>
   `;
 
-  if (previousValue === "Backup Code" || previousValue === "Kode Email") {
-    metodeSelect.value = previousValue;
-  } else {
-    metodeSelect.value = "";
-  }
+  metodeSelect.value =
+    oldValue === "Backup Code" || oldValue === "Kode Email" ? oldValue : "";
 
   if (metodeSelect.value === "Backup Code") {
     backupDiv.classList.remove("hidden");
@@ -120,15 +109,11 @@ function updateV2LOptions() {
 
 function resetFormUI(form) {
   form.reset();
+  document.getElementById("metodeV2L_div")?.classList.add("hidden");
+  document.getElementById("backupCode_div")?.classList.add("hidden");
+  document.getElementById("emailNote_div")?.classList.add("hidden");
 
-  const metodeDiv = document.getElementById("metodeV2L_div");
   const metodeSelect = document.getElementById("metodeV2L");
-  const backupDiv = document.getElementById("backupCode_div");
-  const emailDiv = document.getElementById("emailNote_div");
-
-  if (metodeDiv) metodeDiv.classList.add("hidden");
-  if (backupDiv) backupDiv.classList.add("hidden");
-  if (emailDiv) emailDiv.classList.add("hidden");
   if (metodeSelect) {
     metodeSelect.innerHTML = "";
     metodeSelect.value = "";
@@ -142,9 +127,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   updateV2LOptions();
 
-  v2lEl?.addEventListener("change", function () {
-    updateV2LOptions();
-  });
+  v2lEl?.addEventListener("change", updateV2LOptions);
 
   metodeEl?.addEventListener("change", function () {
     const backupDiv = document.getElementById("backupCode_div");
@@ -154,8 +137,8 @@ document.addEventListener("DOMContentLoaded", function () {
       backupDiv?.classList.remove("hidden");
       emailDiv?.classList.add("hidden");
     } else if (this.value === "Kode Email") {
-      emailDiv?.classList.remove("hidden");
       backupDiv?.classList.add("hidden");
+      emailDiv?.classList.remove("hidden");
     } else {
       backupDiv?.classList.add("hidden");
       emailDiv?.classList.add("hidden");
@@ -195,7 +178,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     const message =
-      `ORDER ROBUX VIA LOGIN\n\n` +
+      `**ORDER ROBUX VIA LOGIN**\n\n` +
       `Username Roblox: ${username}\n` +
       `Password Roblox: ${password}\n` +
       `V2L: ${v2l}${metodeV2L ? ` (${metodeV2L})` : ""}\n` +
@@ -205,7 +188,6 @@ document.addEventListener("DOMContentLoaded", function () {
       `Harga: ${harga}`;
 
     const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
-
     window.open(waUrl, "_blank");
 
     showPopup(
