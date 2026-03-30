@@ -66,7 +66,6 @@ window.isiForm = function isiForm(nominal, harga, kategori) {
 };
 
 function updateV2LOptions() {
-  const kategori = document.getElementById("kategori").value || '';
   const v2lVal = document.getElementById("v2l").value;
   const metodeSelect = document.getElementById("metodeV2L");
   const metodeDiv = document.getElementById("metodeV2L_div");
@@ -83,33 +82,28 @@ function updateV2LOptions() {
 
   metodeDiv.classList.remove("hidden");
 
-  const mustBackup = (kategori === "Basic" || kategori === "Premium");
+  const previousValue = metodeSelect.value;
 
-  if (mustBackup) {
-    metodeSelect.innerHTML =
-      '<option value="">-- Pilih Metode --</option>' +
-      '<option value="Backup Code">Backup Code</option>';
+  metodeSelect.innerHTML =
+    '<option value="">-- Pilih Metode --</option>' +
+    '<option value="Backup Code">Backup Code</option>' +
+    '<option value="Kode Email">Kode Email</option>';
 
-    metodeSelect.value = "Backup Code";
+  if (previousValue === "Backup Code" || previousValue === "Kode Email") {
+    metodeSelect.value = previousValue;
+  } else {
+    metodeSelect.value = "";
+  }
+
+  if (metodeSelect.value === "Backup Code") {
     backupDiv.classList.remove("hidden");
     emailDiv.classList.add("hidden");
+  } else if (metodeSelect.value === "Kode Email") {
+    backupDiv.classList.add("hidden");
+    emailDiv.classList.remove("hidden");
   } else {
-    metodeSelect.innerHTML =
-      '<option value="">-- Pilih Metode --</option>' +
-      '<option value="Backup Code">Backup Code</option>' +
-      '<option value="Kode Email">Kode Email</option>';
-
-    const current = metodeSelect.value;
-    if (current === "Backup Code") {
-      backupDiv.classList.remove("hidden");
-      emailDiv.classList.add("hidden");
-    } else if (current === "Kode Email") {
-      backupDiv.classList.add("hidden");
-      emailDiv.classList.remove("hidden");
-    } else {
-      backupDiv.classList.add("hidden");
-      emailDiv.classList.add("hidden");
-    }
+    backupDiv.classList.add("hidden");
+    emailDiv.classList.add("hidden");
   }
 }
 
@@ -163,14 +157,6 @@ document.addEventListener('DOMContentLoaded', function () {
     if (v2l === "ON") {
       if (!metodeV2L) {
         showPopup('Notification', 'Oops', 'Karena V2L aktif, silakan pilih metode V2L.');
-        document.getElementById("metodeV2L").focus();
-        return;
-      }
-
-      const mustBackup = (kategori === "Basic" || kategori === "Premium");
-
-      if (mustBackup && metodeV2L !== "Backup Code") {
-        showPopup('Notification', 'Oops', 'Kategori ini wajib menggunakan Backup Code.');
         document.getElementById("metodeV2L").focus();
         return;
       }
