@@ -1,17 +1,5 @@
-// =======================
-// SETTINGS
-// =======================
-
-// Ganti ke nomor WhatsApp tujuan
-// format: 628xxxxxxxxxx
 const WHATSAPP_NUMBER = "6281234567890";
 
-// Ubah ke false kalau toko mau ditutup manual
-const STORE_OPEN = true;
-
-// =======================
-// POPUP
-// =======================
 function showPopup(title, message, submessage) {
   const existing = document.getElementById('validationCenterPopup');
   if (existing) existing.remove();
@@ -23,15 +11,11 @@ function showPopup(title, message, submessage) {
   popup.className = 'validation-center';
   popup.tabIndex = -1;
 
-  const safeTitle = title || 'Notification';
-  const safeMsg = message || '';
-  const safeSub = submessage || '';
-
   popup.innerHTML = `
-    <div class="hdr">${safeTitle}</div>
+    <div class="hdr">${title || 'Notification'}</div>
     <div class="divider"></div>
-    <div class="txt">${safeMsg}</div>
-    ${safeSub ? `<div class="subtxt">${safeSub}</div>` : ``}
+    <div class="txt">${message || ''}</div>
+    ${submessage ? `<div class="subtxt">${submessage}</div>` : ``}
     <div class="btnRow">
       <button type="button" class="okbtn">OK</button>
     </div>
@@ -58,9 +42,6 @@ function showPopup(title, message, submessage) {
   }, { once: true });
 }
 
-// =======================
-// UTILS
-// =======================
 function formatHarga(harga) {
   const hargaNumber = typeof harga === 'number'
     ? harga
@@ -72,19 +53,6 @@ function formatHarga(harga) {
   };
 }
 
-function applyStoreStatusUI() {
-  const badge = document.getElementById('shopStatusBadge');
-  if (!badge) return;
-
-  badge.textContent = STORE_OPEN ? 'OPEN' : 'CLOSED';
-  badge.style.borderColor = STORE_OPEN ? '#bbf7d0' : '#fecaca';
-  badge.style.background = STORE_OPEN ? '#ecfdf5' : '#fef2f2';
-  badge.style.color = STORE_OPEN ? '#14532d' : '#7f1d1d';
-}
-
-// =======================
-// FORM HELPER
-// =======================
 window.isiForm = function isiForm(nominal, harga, kategori) {
   document.getElementById("nominal").value = nominal;
 
@@ -94,7 +62,7 @@ window.isiForm = function isiForm(nominal, harga, kategori) {
   document.getElementById("kategori").value = kategori;
 
   updateV2LOptions();
-  document.querySelector('.form-container')?.scrollIntoView({ behavior: 'smooth' });
+  document.querySelector('.form-section')?.scrollIntoView({ behavior: 'smooth' });
 };
 
 function updateV2LOptions() {
@@ -102,7 +70,6 @@ function updateV2LOptions() {
   const v2lVal = document.getElementById("v2l").value;
   const metodeSelect = document.getElementById("metodeV2L");
   const metodeDiv = document.getElementById("metodeV2L_div");
-
   const backupDiv = document.getElementById("backupCode_div");
   const emailDiv = document.getElementById("emailNote_div");
 
@@ -154,12 +121,7 @@ function resetFormUI(form) {
   document.getElementById("metodeV2L").innerHTML = '';
 }
 
-// =======================
-// DOM READY
-// =======================
 document.addEventListener('DOMContentLoaded', function () {
-  applyStoreStatusUI();
-
   document.getElementById("v2l")?.addEventListener("change", function () {
     updateV2LOptions();
   });
@@ -178,15 +140,6 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   document.getElementById("btnWa")?.addEventListener("click", function () {
-    if (!STORE_OPEN) {
-      showPopup(
-        'Notification',
-        'CLOSE',
-        'Mohon maaf, saat ini kamu belum bisa melakukan pemesanan. Silahkan kembali lagi nanti.'
-      );
-      return;
-    }
-
     const form = document.getElementById("orderForm");
     const inputs = form.querySelectorAll("input[required], select[required]");
 
