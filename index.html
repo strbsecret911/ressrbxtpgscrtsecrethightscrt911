@@ -4,129 +4,242 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Pricelist & Form Pembelian Robux - VILOG</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./style.css">
 </head>
 
 <body>
-  <header class="topbar">
-    <div class="brand">
-      <div class="brand-title">VILOG</div>
-      <div class="brand-sub">Pricelist & Form Pembelian Robux</div>
-    </div>
-    <div id="shopStatusBadge" class="status-badge">OPEN</div>
-  </header>
+  <div class="page-shell">
+    <header class="site-header">
+      <div class="site-logo">VILOG</div>
+      <div class="site-url">Form Pembelian Robux</div>
+    </header>
 
-  <!-- PRICELIST -->
-  <div id="pricelistRoot">
-
-    <div class="category">
-      <h3>ROBUX REGULER</h3>
-      <div class="pricelist-container">
-        <div class="price-box" onclick="isiForm('80 Robux', 16000, 'Reguler')">80 Robux <span>Rp16.000</span></div>
-        <div class="price-box" onclick="isiForm('160 Robux', 32000, 'Reguler')">160 Robux <span>Rp32.000</span></div>
-        <div class="price-box" onclick="isiForm('240 Robux', 46500, 'Reguler')">240 Robux <span>Rp46.500</span></div>
-        <div class="price-box" onclick="isiForm('320 Robux', 61500, 'Reguler')">320 Robux <span>Rp61.500</span></div>
-      </div>
-    </div>
-
-    <div class="category">
-      <h3>ROBUX BASIC</h3>
-      <div class="pricelist-container">
-        <div class="price-box" onclick="isiForm('500 Robux', 74500, 'Basic')">500 Robux <span>Rp74.500</span></div>
-        <div class="price-box" onclick="isiForm('580 Robux', 90500, 'Basic')">580 Robux <span>Rp90.500</span></div>
-        <div class="price-box" onclick="isiForm('660 Robux', 106500, 'Basic')">660 Robux <span>Rp106.500</span></div>
-        <div class="price-box" onclick="isiForm('740 Robux', 121000, 'Basic')">740 Robux <span>Rp121.000</span></div>
-        <div class="price-box" onclick="isiForm('820 Robux', 135500, 'Basic')">820 Robux <span>Rp135.500</span></div>
-        <div class="price-box" onclick="isiForm('1000 Robux', 149000, 'Basic')">1000 Robux <span>Rp149.000</span></div>
-        <div class="price-box" onclick="isiForm('1240 Robux', 195500, 'Basic')">1240 Robux <span>Rp195.500</span></div>
-        <div class="price-box" onclick="isiForm('1500 Robux', 223500, 'Basic')">1500 Robux <span>Rp223.500</span></div>
-        <div class="price-box" onclick="isiForm('1740 Robux', 270000, 'Basic')">1740 Robux <span>Rp270.000</span></div>
-        <div class="price-box" onclick="isiForm('2000 Robux', 298000, 'Basic')">2000 Robux <span>Rp298.000</span></div>
-        <div class="price-box" onclick="isiForm('2500 Robux', 372500, 'Basic')">2500 Robux <span>Rp372.500</span></div>
-        <div class="price-box" onclick="isiForm('3000 Robux', 447000, 'Basic')">3000 Robux <span>Rp447.000</span></div>
-        <div class="price-box" onclick="isiForm('3500 Robux', 521500, 'Basic')">3500 Robux <span>Rp521.500</span></div>
-        <div class="price-box" onclick="isiForm('4000 Robux', 596000, 'Basic')">4000 Robux <span>Rp596.000</span></div>
-        <div class="price-box" onclick="isiForm('4500 Robux', 670500, 'Basic')">4500 Robux <span>Rp670.500</span></div>
-        <div class="price-box" onclick="isiForm('5000 Robux', 745000, 'Basic')">5000 Robux <span>Rp745.000</span></div>
-        <div class="price-box" onclick="isiForm('10000 Robux', 1490000, 'Basic')">10000 Robux <span>Rp1.490.000</span></div>
-        <div class="price-box" onclick="isiForm('22500 Robux', 3352500, 'Basic')">22500 Robux <span>Rp3.352.500</span></div>
-      </div>
-    </div>
-
-    <div class="category">
-      <h3>ROBUX + PREMIUM (1 MONTH)</h3>
-      <div class="pricelist-container">
-        <div class="price-box" onclick="isiForm('450 Robux + Prem', 74500, 'Premium')">450 Robux + Prem <span>Rp74.500</span></div>
-        <div class="price-box" onclick="isiForm('1000 Robux + Prem', 149000, 'Premium')">1000 Robux + Prem <span>Rp149.000</span></div>
-        <div class="price-box" onclick="isiForm('1550 Robux + Prem', 223500, 'Premium')">1550 Robux + Prem <span>Rp223.500</span></div>
-        <div class="price-box" onclick="isiForm('2200 Robux + Prem', 298000, 'Premium')">2200 Robux + Prem <span>Rp298.000</span></div>
-        <div class="price-box" onclick="isiForm('3300 Robux + Prem', 447000, 'Premium')">3300 Robux + Prem <span>Rp447.000</span></div>
-        <div class="price-box" onclick="isiForm('4400 Robux + Prem', 596000, 'Premium')">4400 Robux + Prem <span>Rp596.000</span></div>
-        <div class="price-box" onclick="isiForm('5500 Robux + Prem', 745000, 'Premium')">5500 Robux + Prem <span>Rp745.000</span></div>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- Form -->
-  <div class="form-container">
-    <h2>Formulir Pembelian Robux VILOG</h2>
-
-    <form id="orderForm" autocomplete="off">
-      <div class="form-group">
-        <label for="username">Username Roblox *</label>
-        <input type="text" id="username" name="username" placeholder="Username Roblox" required>
+    <main class="main-card">
+      <div class="hero-box">
+        <h1>Pricelist Robux</h1>
+        <p>Pilih nominal yang kamu mau, lalu isi form order di bawah.</p>
       </div>
 
-      <div class="form-group">
-        <label for="password">Password Roblox *</label>
-        <input type="password" id="password" name="password" placeholder="Password Roblox" required>
-      </div>
+      <section class="category-block">
+        <h2>ROBUX REGULER</h2>
+        <div class="pricelist-grid">
+          <button type="button" class="price-card" onclick="isiForm('80 Robux', 16000, 'Reguler')">
+            <span class="item-name">80 Robux</span>
+            <span class="item-price">Rp 16.000</span>
+          </button>
 
-      <div class="form-group">
-        <label for="v2l">Verifikasi 2 Langkah (V2L) *</label>
-        <select id="v2l" name="v2l" required>
-          <option value="">-- Pilih Status --</option>
-          <option value="OFF">Nonaktif (OFF)</option>
-          <option value="ON">Aktif (ON)</option>
-        </select>
-      </div>
+          <button type="button" class="price-card" onclick="isiForm('160 Robux', 32000, 'Reguler')">
+            <span class="item-name">160 Robux</span>
+            <span class="item-price">Rp 32.000</span>
+          </button>
 
-      <div class="form-group hidden" id="metodeV2L_div">
-        <label for="metodeV2L">Pilih Metode V2L *</label>
-        <select id="metodeV2L" name="metodeV2L"></select>
-      </div>
+          <button type="button" class="price-card" onclick="isiForm('240 Robux', 46500, 'Reguler')">
+            <span class="item-name">240 Robux</span>
+            <span class="item-price">Rp 46.500</span>
+          </button>
 
-      <div class="form-group hidden" id="backupCode_div">
-        <label for="backupCode">Masukkan Backup Code *</label>
-        <input type="text" id="backupCode" name="backupCode" placeholder="Isi Backup Code">
-        <div class="notes">Masukkan 1-3 backup code yang belum pernah digunakan.</div>
-      </div>
+          <button type="button" class="price-card" onclick="isiForm('320 Robux', 61500, 'Reguler')">
+            <span class="item-name">320 Robux</span>
+            <span class="item-price">Rp 61.500</span>
+          </button>
+        </div>
+      </section>
 
-      <div class="form-group hidden" id="emailNote_div">
-        <div class="notes">Pastikan storage email tidak penuh supaya bisa menerima kode V2L. Wajib standby setelah order & diharapkan fastrespon.</div>
-      </div>
+      <section class="category-block">
+        <h2>ROBUX BASIC</h2>
+        <div class="pricelist-grid">
+          <button type="button" class="price-card" onclick="isiForm('500 Robux', 74500, 'Basic')">
+            <span class="item-name">500 Robux</span>
+            <span class="item-price">Rp 74.500</span>
+          </button>
 
-      <div class="form-group">
-        <label for="kategori">Kategori Robux *</label>
-        <input type="text" id="kategori" name="kategori" readonly required>
-      </div>
+          <button type="button" class="price-card" onclick="isiForm('580 Robux', 90500, 'Basic')">
+            <span class="item-name">580 Robux</span>
+            <span class="item-price">Rp 90.500</span>
+          </button>
 
-      <div class="form-group">
-        <label for="nominal">Jumlah Order *</label>
-        <input type="text" id="nominal" name="nominal" readonly required>
-      </div>
+          <button type="button" class="price-card" onclick="isiForm('660 Robux', 106500, 'Basic')">
+            <span class="item-name">660 Robux</span>
+            <span class="item-price">Rp 106.500</span>
+          </button>
 
-      <div class="form-group">
-        <label for="harga">Harga *</label>
-        <input type="text" id="harga" name="harga" readonly required>
-      </div>
+          <button type="button" class="price-card" onclick="isiForm('740 Robux', 121000, 'Basic')">
+            <span class="item-name">740 Robux</span>
+            <span class="item-price">Rp 121.000</span>
+          </button>
 
-      <div style="text-align:center; margin: 14px 0 6px;">
-        <button type="button" id="btnWa">Pesan via WhatsApp</button>
-      </div>
-    </form>
+          <button type="button" class="price-card" onclick="isiForm('820 Robux', 135500, 'Basic')">
+            <span class="item-name">820 Robux</span>
+            <span class="item-price">Rp 135.500</span>
+          </button>
+
+          <button type="button" class="price-card" onclick="isiForm('1000 Robux', 149000, 'Basic')">
+            <span class="item-name">1000 Robux</span>
+            <span class="item-price">Rp 149.000</span>
+          </button>
+
+          <button type="button" class="price-card" onclick="isiForm('1240 Robux', 195500, 'Basic')">
+            <span class="item-name">1240 Robux</span>
+            <span class="item-price">Rp 195.500</span>
+          </button>
+
+          <button type="button" class="price-card" onclick="isiForm('1500 Robux', 223500, 'Basic')">
+            <span class="item-name">1500 Robux</span>
+            <span class="item-price">Rp 223.500</span>
+          </button>
+
+          <button type="button" class="price-card" onclick="isiForm('1740 Robux', 270000, 'Basic')">
+            <span class="item-name">1740 Robux</span>
+            <span class="item-price">Rp 270.000</span>
+          </button>
+
+          <button type="button" class="price-card" onclick="isiForm('2000 Robux', 298000, 'Basic')">
+            <span class="item-name">2000 Robux</span>
+            <span class="item-price">Rp 298.000</span>
+          </button>
+
+          <button type="button" class="price-card" onclick="isiForm('2500 Robux', 372500, 'Basic')">
+            <span class="item-name">2500 Robux</span>
+            <span class="item-price">Rp 372.500</span>
+          </button>
+
+          <button type="button" class="price-card" onclick="isiForm('3000 Robux', 447000, 'Basic')">
+            <span class="item-name">3000 Robux</span>
+            <span class="item-price">Rp 447.000</span>
+          </button>
+
+          <button type="button" class="price-card" onclick="isiForm('3500 Robux', 521500, 'Basic')">
+            <span class="item-name">3500 Robux</span>
+            <span class="item-price">Rp 521.500</span>
+          </button>
+
+          <button type="button" class="price-card" onclick="isiForm('4000 Robux', 596000, 'Basic')">
+            <span class="item-name">4000 Robux</span>
+            <span class="item-price">Rp 596.000</span>
+          </button>
+
+          <button type="button" class="price-card" onclick="isiForm('4500 Robux', 670500, 'Basic')">
+            <span class="item-name">4500 Robux</span>
+            <span class="item-price">Rp 670.500</span>
+          </button>
+
+          <button type="button" class="price-card" onclick="isiForm('5000 Robux', 745000, 'Basic')">
+            <span class="item-name">5000 Robux</span>
+            <span class="item-price">Rp 745.000</span>
+          </button>
+
+          <button type="button" class="price-card" onclick="isiForm('10000 Robux', 1490000, 'Basic')">
+            <span class="item-name">10000 Robux</span>
+            <span class="item-price">Rp 1.490.000</span>
+          </button>
+
+          <button type="button" class="price-card" onclick="isiForm('22500 Robux', 3352500, 'Basic')">
+            <span class="item-name">22500 Robux</span>
+            <span class="item-price">Rp 3.352.500</span>
+          </button>
+        </div>
+      </section>
+
+      <section class="category-block">
+        <h2>ROBUX + PREMIUM (1 MONTH)</h2>
+        <div class="pricelist-grid">
+          <button type="button" class="price-card" onclick="isiForm('450 Robux + Prem', 74500, 'Premium')">
+            <span class="item-name">450 Robux + Prem</span>
+            <span class="item-price">Rp 74.500</span>
+          </button>
+
+          <button type="button" class="price-card" onclick="isiForm('1000 Robux + Prem', 149000, 'Premium')">
+            <span class="item-name">1000 Robux + Prem</span>
+            <span class="item-price">Rp 149.000</span>
+          </button>
+
+          <button type="button" class="price-card" onclick="isiForm('1550 Robux + Prem', 223500, 'Premium')">
+            <span class="item-name">1550 Robux + Prem</span>
+            <span class="item-price">Rp 223.500</span>
+          </button>
+
+          <button type="button" class="price-card" onclick="isiForm('2200 Robux + Prem', 298000, 'Premium')">
+            <span class="item-name">2200 Robux + Prem</span>
+            <span class="item-price">Rp 298.000</span>
+          </button>
+
+          <button type="button" class="price-card" onclick="isiForm('3300 Robux + Prem', 447000, 'Premium')">
+            <span class="item-name">3300 Robux + Prem</span>
+            <span class="item-price">Rp 447.000</span>
+          </button>
+
+          <button type="button" class="price-card" onclick="isiForm('4400 Robux + Prem', 596000, 'Premium')">
+            <span class="item-name">4400 Robux + Prem</span>
+            <span class="item-price">Rp 596.000</span>
+          </button>
+
+          <button type="button" class="price-card" onclick="isiForm('5500 Robux + Prem', 745000, 'Premium')">
+            <span class="item-name">5500 Robux + Prem</span>
+            <span class="item-price">Rp 745.000</span>
+          </button>
+        </div>
+      </section>
+
+      <section class="form-section">
+        <h2>Form Order</h2>
+
+        <form id="orderForm" autocomplete="off">
+          <div class="form-group">
+            <label for="username">Username Roblox *</label>
+            <input type="text" id="username" name="username" placeholder="Masukkan username Roblox" required>
+          </div>
+
+          <div class="form-group">
+            <label for="password">Password Roblox *</label>
+            <input type="password" id="password" name="password" placeholder="Masukkan password Roblox" required>
+          </div>
+
+          <div class="form-group">
+            <label for="v2l">Verifikasi 2 Langkah (V2L) *</label>
+            <select id="v2l" name="v2l" required>
+              <option value="">-- Pilih Status --</option>
+              <option value="OFF">Nonaktif (OFF)</option>
+              <option value="ON">Aktif (ON)</option>
+            </select>
+          </div>
+
+          <div class="form-group hidden" id="metodeV2L_div">
+            <label for="metodeV2L">Pilih Metode V2L *</label>
+            <select id="metodeV2L" name="metodeV2L"></select>
+          </div>
+
+          <div class="form-group hidden" id="backupCode_div">
+            <label for="backupCode">Masukkan Backup Code *</label>
+            <input type="text" id="backupCode" name="backupCode" placeholder="Isi Backup Code">
+            <div class="notes">Masukkan 1-3 backup code yang belum pernah digunakan.</div>
+          </div>
+
+          <div class="form-group hidden" id="emailNote_div">
+            <div class="notes">Pastikan storage email tidak penuh supaya bisa menerima kode V2L. Wajib standby setelah order dan diharapkan fastrespon.</div>
+          </div>
+
+          <div class="form-group">
+            <label for="kategori">Kategori Robux *</label>
+            <input type="text" id="kategori" name="kategori" readonly required>
+          </div>
+
+          <div class="form-group">
+            <label for="nominal">Jumlah Order *</label>
+            <input type="text" id="nominal" name="nominal" readonly required>
+          </div>
+
+          <div class="form-group">
+            <label for="harga">Harga *</label>
+            <input type="text" id="harga" name="harga" readonly required>
+          </div>
+
+          <div class="submit-wrap">
+            <button type="button" id="btnWa">Pesan via WhatsApp</button>
+          </div>
+        </form>
+      </section>
+    </main>
   </div>
 
   <div id="validationContainer"></div>
