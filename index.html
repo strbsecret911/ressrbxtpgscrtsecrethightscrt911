@@ -14,11 +14,60 @@
       <div class="brand-title">VILOG</div>
       <div class="brand-sub">Pricelist & Form Pembelian Robux</div>
     </div>
-    <div id="shopStatusBadge" class="status-badge">—</div>
+    <div id="shopStatusBadge" class="status-badge">OPEN</div>
   </header>
 
-  <!-- PRICELIST RENDER DARI FIRESTORE -->
-  <div id="pricelistRoot"></div>
+  <!-- PRICELIST -->
+  <div id="pricelistRoot">
+
+    <div class="category">
+      <h3>ROBUX REGULER</h3>
+      <div class="pricelist-container">
+        <div class="price-box" onclick="isiForm('80 Robux', 16000, 'Reguler')">80 Robux <span>Rp16.000</span></div>
+        <div class="price-box" onclick="isiForm('160 Robux', 32000, 'Reguler')">160 Robux <span>Rp32.000</span></div>
+        <div class="price-box" onclick="isiForm('240 Robux', 46500, 'Reguler')">240 Robux <span>Rp46.500</span></div>
+        <div class="price-box" onclick="isiForm('320 Robux', 61500, 'Reguler')">320 Robux <span>Rp61.500</span></div>
+      </div>
+    </div>
+
+    <div class="category">
+      <h3>ROBUX BASIC</h3>
+      <div class="pricelist-container">
+        <div class="price-box" onclick="isiForm('500 Robux', 74500, 'Basic')">500 Robux <span>Rp74.500</span></div>
+        <div class="price-box" onclick="isiForm('580 Robux', 90500, 'Basic')">580 Robux <span>Rp90.500</span></div>
+        <div class="price-box" onclick="isiForm('660 Robux', 106500, 'Basic')">660 Robux <span>Rp106.500</span></div>
+        <div class="price-box" onclick="isiForm('740 Robux', 121000, 'Basic')">740 Robux <span>Rp121.000</span></div>
+        <div class="price-box" onclick="isiForm('820 Robux', 135500, 'Basic')">820 Robux <span>Rp135.500</span></div>
+        <div class="price-box" onclick="isiForm('1000 Robux', 149000, 'Basic')">1000 Robux <span>Rp149.000</span></div>
+        <div class="price-box" onclick="isiForm('1240 Robux', 195500, 'Basic')">1240 Robux <span>Rp195.500</span></div>
+        <div class="price-box" onclick="isiForm('1500 Robux', 223500, 'Basic')">1500 Robux <span>Rp223.500</span></div>
+        <div class="price-box" onclick="isiForm('1740 Robux', 270000, 'Basic')">1740 Robux <span>Rp270.000</span></div>
+        <div class="price-box" onclick="isiForm('2000 Robux', 298000, 'Basic')">2000 Robux <span>Rp298.000</span></div>
+        <div class="price-box" onclick="isiForm('2500 Robux', 372500, 'Basic')">2500 Robux <span>Rp372.500</span></div>
+        <div class="price-box" onclick="isiForm('3000 Robux', 447000, 'Basic')">3000 Robux <span>Rp447.000</span></div>
+        <div class="price-box" onclick="isiForm('3500 Robux', 521500, 'Basic')">3500 Robux <span>Rp521.500</span></div>
+        <div class="price-box" onclick="isiForm('4000 Robux', 596000, 'Basic')">4000 Robux <span>Rp596.000</span></div>
+        <div class="price-box" onclick="isiForm('4500 Robux', 670500, 'Basic')">4500 Robux <span>Rp670.500</span></div>
+        <div class="price-box" onclick="isiForm('5000 Robux', 745000, 'Basic')">5000 Robux <span>Rp745.000</span></div>
+        <div class="price-box" onclick="isiForm('10000 Robux', 1490000, 'Basic')">10000 Robux <span>Rp1.490.000</span></div>
+        <div class="price-box" onclick="isiForm('22500 Robux', 3352500, 'Basic')">22500 Robux <span>Rp3.352.500</span></div>
+      </div>
+    </div>
+
+    <div class="category">
+      <h3>ROBUX + PREMIUM (1 MONTH)</h3>
+      <div class="pricelist-container">
+        <div class="price-box" onclick="isiForm('450 Robux + Prem', 74500, 'Premium')">450 Robux + Prem <span>Rp74.500</span></div>
+        <div class="price-box" onclick="isiForm('1000 Robux + Prem', 149000, 'Premium')">1000 Robux + Prem <span>Rp149.000</span></div>
+        <div class="price-box" onclick="isiForm('1550 Robux + Prem', 223500, 'Premium')">1550 Robux + Prem <span>Rp223.500</span></div>
+        <div class="price-box" onclick="isiForm('2200 Robux + Prem', 298000, 'Premium')">2200 Robux + Prem <span>Rp298.000</span></div>
+        <div class="price-box" onclick="isiForm('3300 Robux + Prem', 447000, 'Premium')">3300 Robux + Prem <span>Rp447.000</span></div>
+        <div class="price-box" onclick="isiForm('4400 Robux + Prem', 596000, 'Premium')">4400 Robux + Prem <span>Rp596.000</span></div>
+        <div class="price-box" onclick="isiForm('5500 Robux + Prem', 745000, 'Premium')">5500 Robux + Prem <span>Rp745.000</span></div>
+      </div>
+    </div>
+
+  </div>
 
   <!-- Form -->
   <div class="form-container">
@@ -56,7 +105,7 @@
       </div>
 
       <div class="form-group hidden" id="emailNote_div">
-        <div class="notes">Pastikan storage email tidak penuh supaya bisa menerima kode V2L. Wajib standby setelah payment & diharapkan fastrespon.</div>
+        <div class="notes">Pastikan storage email tidak penuh supaya bisa menerima kode V2L. Wajib standby setelah order & diharapkan fastrespon.</div>
       </div>
 
       <div class="form-group">
@@ -75,102 +124,9 @@
       </div>
 
       <div style="text-align:center; margin: 14px 0 6px;">
-        <button type="button" id="btnWa">Pesan via Telegram</button>
+        <button type="button" id="btnWa">Pesan via WhatsApp</button>
       </div>
     </form>
-  </div>
-
-  <!-- Payment Modal -->
-  <div id="paymentModalBackdrop" class="modal-backdrop" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-      <h3 id="modalTitle">Pembayaran</h3>
-
-      <img id="modalQr" class="qr" src="" alt="QR Pembayaran">
-      <div id="modalAmount" class="amount">Rp0</div>
-
-      <div class="method-switch">
-        <button type="button" class="method-btn active" data-method="qris">QRIS</button>
-        <button type="button" class="method-btn" data-method="gopay">GoPay</button>
-        <button type="button" class="method-btn" data-method="seabank">SeaBank</button>
-        <button type="button" class="method-btn" data-method="bri">BRI</button>
-      </div>
-
-      <div class="wallet-section">
-        <div id="walletLabel" class="wallet-label">QRIS All Payment (scan QR di atas)</div>
-
-        <div id="walletNumberWrapper">
-          <div id="walletNumberTitle" class="wallet-number-title">No tujuan pembayaran</div>
-          <div id="walletNumber" class="wallet-number">Gunakan QR di atas</div>
-          <button id="copyNumberBtn" type="button" class="copy-mini-btn">Salin nomor</button>
-        </div>
-
-        <div id="walletNote" class="wallet-note">
-          QRIS hingga Rp499.000 tidak ada biaya tambahan. Di atas itu akan dikenakan biaya 0,3% dari nominal.
-        </div>
-      </div>
-
-      <div class="pay-note">
-        Data pesanan berhasil dikirim! Silahkan lakukan pembayaran, lalu screenshot bukti pembayaran.
-      </div>
-
-      <div class="actions">
-        <button id="copyAmountBtn" type="button">Salin Jumlah</button>
-        <button id="openBotBtn" type="button">Buka Bot</button>
-      </div>
-
-      <div class="small-note">
-        Setelah bayar dan screenshot, klik Buka Bot untuk konfirmasi pembayaran agar pesanan segera diproses.
-      </div>
-
-      <div style="margin-top:10px;">
-        <button id="closeModalBtn" type="button" class="btn-gray">Tutup</button>
-      </div>
-
-      <div id="copySuccess" class="copy-success"></div>
-    </div>
-  </div>
-
-  <!-- ADMIN PANEL (muncul kalau ?admin=1) -->
-  <div id="adminPanel" class="admin-panel" style="display:none;">
-    <div class="admin-title">
-      <span>Admin Panel</span>
-      <span id="adminBadge" class="admin-badge">—</span>
-    </div>
-
-    <div class="admin-auth">
-      <button type="button" id="btnAdminLogin" class="admin-login">Login Admin</button>
-      <button type="button" id="btnAdminLogout" class="admin-logout" style="display:none;">Logout</button>
-      <div id="adminEmail" class="admin-email"></div>
-    </div>
-
-    <div class="admin-actions">
-      <button type="button" id="btnSetOpen" class="admin-open">OPEN</button>
-      <button type="button" id="btnSetClose" class="admin-close">CLOSE</button>
-    </div>
-
-    <div class="admin-mini">
-      Admin hanya untuk <b>dinijanuari23@gmail.com</b><br>
-      Panel muncul jika URL ada <b>?admin=1</b>
-    </div>
-
-    <hr class="admin-hr"/>
-
-    <div class="admin-editor">
-      <div class="admin-editor-head">
-        <div>
-          <div class="admin-h">Edit Pricelist</div>
-          <div class="admin-sub">Tambah / edit / hapus item, lalu simpan.</div>
-        </div>
-        <button type="button" id="btnAddItem" class="admin-add">+ Tambah Item</button>
-      </div>
-
-      <div id="adminList" class="admin-list"></div>
-
-      <div class="admin-savebar">
-        <button type="button" id="btnSaveAll" class="admin-save">Simpan Perubahan</button>
-        <div id="adminSaveMsg" class="admin-savemsg"></div>
-      </div>
-    </div>
   </div>
 
   <div id="validationContainer"></div>
