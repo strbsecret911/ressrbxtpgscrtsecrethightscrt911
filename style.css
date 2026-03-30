@@ -144,6 +144,11 @@ form {
   color: #6b7280;
 }
 
+/* HIDDEN ELEMENT */
+.hidden {
+  display: none !important;
+}
+
 /* BUTTON */
 .submit-wrap {
   text-align: center;
@@ -152,16 +157,12 @@ form {
 #btnWa {
   background: #4b628d;
   color: #fff;
-
   font-size: 12px;
   font-weight: 700;
-
   border-radius: 10px;
   padding: 10px 14px;
-
   min-width: 160px;
   max-width: 220px;
-
   border: none;
   cursor: pointer;
 }
