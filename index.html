@@ -9,6 +9,7 @@
 </head>
 
 <body>
+  <div class="page-shell">
     <main class="main-card">
       <div class="hero-box">
         <h1>Pricelist Robux</h1>
@@ -22,17 +23,14 @@
             <span class="item-name">80 Robux</span>
             <span class="item-price">Rp 16.000</span>
           </button>
-
           <button type="button" class="price-card" onclick="isiForm('160 Robux', 32000, 'Reguler')">
             <span class="item-name">160 Robux</span>
             <span class="item-price">Rp 32.000</span>
           </button>
-
           <button type="button" class="price-card" onclick="isiForm('240 Robux', 46500, 'Reguler')">
             <span class="item-name">240 Robux</span>
             <span class="item-price">Rp 46.500</span>
           </button>
-
           <button type="button" class="price-card" onclick="isiForm('320 Robux', 61500, 'Reguler')">
             <span class="item-name">320 Robux</span>
             <span class="item-price">Rp 61.500</span>
@@ -43,135 +41,37 @@
       <section class="category-block">
         <h2>ROBUX BASIC</h2>
         <div class="pricelist-grid">
-          <button type="button" class="price-card" onclick="isiForm('500 Robux', 74500, 'Basic')">
-            <span class="item-name">500 Robux</span>
-            <span class="item-price">Rp 74.500</span>
-          </button>
-
-          <button type="button" class="price-card" onclick="isiForm('580 Robux', 90500, 'Basic')">
-            <span class="item-name">580 Robux</span>
-            <span class="item-price">Rp 90.500</span>
-          </button>
-
-          <button type="button" class="price-card" onclick="isiForm('660 Robux', 106500, 'Basic')">
-            <span class="item-name">660 Robux</span>
-            <span class="item-price">Rp 106.500</span>
-          </button>
-
-          <button type="button" class="price-card" onclick="isiForm('740 Robux', 121000, 'Basic')">
-            <span class="item-name">740 Robux</span>
-            <span class="item-price">Rp 121.000</span>
-          </button>
-
-          <button type="button" class="price-card" onclick="isiForm('820 Robux', 135500, 'Basic')">
-            <span class="item-name">820 Robux</span>
-            <span class="item-price">Rp 135.500</span>
-          </button>
-
-          <button type="button" class="price-card" onclick="isiForm('1000 Robux', 149000, 'Basic')">
-            <span class="item-name">1000 Robux</span>
-            <span class="item-price">Rp 149.000</span>
-          </button>
-
-          <button type="button" class="price-card" onclick="isiForm('1240 Robux', 195500, 'Basic')">
-            <span class="item-name">1240 Robux</span>
-            <span class="item-price">Rp 195.500</span>
-          </button>
-
-          <button type="button" class="price-card" onclick="isiForm('1500 Robux', 223500, 'Basic')">
-            <span class="item-name">1500 Robux</span>
-            <span class="item-price">Rp 223.500</span>
-          </button>
-
-          <button type="button" class="price-card" onclick="isiForm('1740 Robux', 270000, 'Basic')">
-            <span class="item-name">1740 Robux</span>
-            <span class="item-price">Rp 270.000</span>
-          </button>
-
-          <button type="button" class="price-card" onclick="isiForm('2000 Robux', 298000, 'Basic')">
-            <span class="item-name">2000 Robux</span>
-            <span class="item-price">Rp 298.000</span>
-          </button>
-
-          <button type="button" class="price-card" onclick="isiForm('2500 Robux', 372500, 'Basic')">
-            <span class="item-name">2500 Robux</span>
-            <span class="item-price">Rp 372.500</span>
-          </button>
-
-          <button type="button" class="price-card" onclick="isiForm('3000 Robux', 447000, 'Basic')">
-            <span class="item-name">3000 Robux</span>
-            <span class="item-price">Rp 447.000</span>
-          </button>
-
-          <button type="button" class="price-card" onclick="isiForm('3500 Robux', 521500, 'Basic')">
-            <span class="item-name">3500 Robux</span>
-            <span class="item-price">Rp 521.500</span>
-          </button>
-
-          <button type="button" class="price-card" onclick="isiForm('4000 Robux', 596000, 'Basic')">
-            <span class="item-name">4000 Robux</span>
-            <span class="item-price">Rp 596.000</span>
-          </button>
-
-          <button type="button" class="price-card" onclick="isiForm('4500 Robux', 670500, 'Basic')">
-            <span class="item-name">4500 Robux</span>
-            <span class="item-price">Rp 670.500</span>
-          </button>
-
-          <button type="button" class="price-card" onclick="isiForm('5000 Robux', 745000, 'Basic')">
-            <span class="item-name">5000 Robux</span>
-            <span class="item-price">Rp 745.000</span>
-          </button>
-
-          <button type="button" class="price-card" onclick="isiForm('10000 Robux', 1490000, 'Basic')">
-            <span class="item-name">10000 Robux</span>
-            <span class="item-price">Rp 1.490.000</span>
-          </button>
-
-          <button type="button" class="price-card" onclick="isiForm('22500 Robux', 3352500, 'Basic')">
-            <span class="item-name">22500 Robux</span>
-            <span class="item-price">Rp 3.352.500</span>
-          </button>
+          <button type="button" class="price-card" onclick="isiForm('500 Robux', 74500, 'Basic')"><span class="item-name">500 Robux</span><span class="item-price">Rp 74.500</span></button>
+          <button type="button" class="price-card" onclick="isiForm('580 Robux', 90500, 'Basic')"><span class="item-name">580 Robux</span><span class="item-price">Rp 90.500</span></button>
+          <button type="button" class="price-card" onclick="isiForm('660 Robux', 106500, 'Basic')"><span class="item-name">660 Robux</span><span class="item-price">Rp 106.500</span></button>
+          <button type="button" class="price-card" onclick="isiForm('740 Robux', 121000, 'Basic')"><span class="item-name">740 Robux</span><span class="item-price">Rp 121.000</span></button>
+          <button type="button" class="price-card" onclick="isiForm('820 Robux', 135500, 'Basic')"><span class="item-name">820 Robux</span><span class="item-price">Rp 135.500</span></button>
+          <button type="button" class="price-card" onclick="isiForm('1000 Robux', 149000, 'Basic')"><span class="item-name">1000 Robux</span><span class="item-price">Rp 149.000</span></button>
+          <button type="button" class="price-card" onclick="isiForm('1240 Robux', 195500, 'Basic')"><span class="item-name">1240 Robux</span><span class="item-price">Rp 195.500</span></button>
+          <button type="button" class="price-card" onclick="isiForm('1500 Robux', 223500, 'Basic')"><span class="item-name">1500 Robux</span><span class="item-price">Rp 223.500</span></button>
+          <button type="button" class="price-card" onclick="isiForm('1740 Robux', 270000, 'Basic')"><span class="item-name">1740 Robux</span><span class="item-price">Rp 270.000</span></button>
+          <button type="button" class="price-card" onclick="isiForm('2000 Robux', 298000, 'Basic')"><span class="item-name">2000 Robux</span><span class="item-price">Rp 298.000</span></button>
+          <button type="button" class="price-card" onclick="isiForm('2500 Robux', 372500, 'Basic')"><span class="item-name">2500 Robux</span><span class="item-price">Rp 372.500</span></button>
+          <button type="button" class="price-card" onclick="isiForm('3000 Robux', 447000, 'Basic')"><span class="item-name">3000 Robux</span><span class="item-price">Rp 447.000</span></button>
+          <button type="button" class="price-card" onclick="isiForm('3500 Robux', 521500, 'Basic')"><span class="item-name">3500 Robux</span><span class="item-price">Rp 521.500</span></button>
+          <button type="button" class="price-card" onclick="isiForm('4000 Robux', 596000, 'Basic')"><span class="item-name">4000 Robux</span><span class="item-price">Rp 596.000</span></button>
+          <button type="button" class="price-card" onclick="isiForm('4500 Robux', 670500, 'Basic')"><span class="item-name">4500 Robux</span><span class="item-price">Rp 670.500</span></button>
+          <button type="button" class="price-card" onclick="isiForm('5000 Robux', 745000, 'Basic')"><span class="item-name">5000 Robux</span><span class="item-price">Rp 745.000</span></button>
+          <button type="button" class="price-card" onclick="isiForm('10000 Robux', 1490000, 'Basic')"><span class="item-name">10000 Robux</span><span class="item-price">Rp 1.490.000</span></button>
+          <button type="button" class="price-card" onclick="isiForm('22500 Robux', 3352500, 'Basic')"><span class="item-name">22500 Robux</span><span class="item-price">Rp 3.352.500</span></button>
         </div>
       </section>
 
       <section class="category-block">
         <h2>ROBUX + PREMIUM (1 MONTH)</h2>
         <div class="pricelist-grid">
-          <button type="button" class="price-card" onclick="isiForm('450 Robux + Prem', 74500, 'Premium')">
-            <span class="item-name">450 Robux + Prem</span>
-            <span class="item-price">Rp 74.500</span>
-          </button>
-
-          <button type="button" class="price-card" onclick="isiForm('1000 Robux + Prem', 149000, 'Premium')">
-            <span class="item-name">1000 Robux + Prem</span>
-            <span class="item-price">Rp 149.000</span>
-          </button>
-
-          <button type="button" class="price-card" onclick="isiForm('1550 Robux + Prem', 223500, 'Premium')">
-            <span class="item-name">1550 Robux + Prem</span>
-            <span class="item-price">Rp 223.500</span>
-          </button>
-
-          <button type="button" class="price-card" onclick="isiForm('2200 Robux + Prem', 298000, 'Premium')">
-            <span class="item-name">2200 Robux + Prem</span>
-            <span class="item-price">Rp 298.000</span>
-          </button>
-
-          <button type="button" class="price-card" onclick="isiForm('3300 Robux + Prem', 447000, 'Premium')">
-            <span class="item-name">3300 Robux + Prem</span>
-            <span class="item-price">Rp 447.000</span>
-          </button>
-
-          <button type="button" class="price-card" onclick="isiForm('4400 Robux + Prem', 596000, 'Premium')">
-            <span class="item-name">4400 Robux + Prem</span>
-            <span class="item-price">Rp 596.000</span>
-          </button>
-
-          <button type="button" class="price-card" onclick="isiForm('5500 Robux + Prem', 745000, 'Premium')">
-            <span class="item-name">5500 Robux + Prem</span>
-            <span class="item-price">Rp 745.000</span>
-          </button>
+          <button type="button" class="price-card" onclick="isiForm('450 Robux + Prem', 74500, 'Premium')"><span class="item-name">450 Robux + Prem</span><span class="item-price">Rp 74.500</span></button>
+          <button type="button" class="price-card" onclick="isiForm('1000 Robux + Prem', 149000, 'Premium')"><span class="item-name">1000 Robux + Prem</span><span class="item-price">Rp 149.000</span></button>
+          <button type="button" class="price-card" onclick="isiForm('1550 Robux + Prem', 223500, 'Premium')"><span class="item-name">1550 Robux + Prem</span><span class="item-price">Rp 223.500</span></button>
+          <button type="button" class="price-card" onclick="isiForm('2200 Robux + Prem', 298000, 'Premium')"><span class="item-name">2200 Robux + Prem</span><span class="item-price">Rp 298.000</span></button>
+          <button type="button" class="price-card" onclick="isiForm('3300 Robux + Prem', 447000, 'Premium')"><span class="item-name">3300 Robux + Prem</span><span class="item-price">Rp 447.000</span></button>
+          <button type="button" class="price-card" onclick="isiForm('4400 Robux + Prem', 596000, 'Premium')"><span class="item-name">4400 Robux + Prem</span><span class="item-price">Rp 596.000</span></button>
+          <button type="button" class="price-card" onclick="isiForm('5500 Robux + Prem', 745000, 'Premium')"><span class="item-name">5500 Robux + Prem</span><span class="item-price">Rp 745.000</span></button>
         </div>
       </section>
 
